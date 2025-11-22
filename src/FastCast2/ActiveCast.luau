@@ -34,16 +34,16 @@ ActiveCast.__type = "ActiveCast"
 
 -----> Local functions
 
-function GetPositionAtTime(time: number, origin: Vector3, initialVelocity: Vector3, acceleration: Vector3): Vector3
+local function GetPositionAtTime(time: number, origin: Vector3, initialVelocity: Vector3, acceleration: Vector3): Vector3
 	local force = Vector3.new((acceleration.X * time^2) / 2,(acceleration.Y * time^2) / 2, (acceleration.Z * time^2) / 2)
 	return origin + (initialVelocity * time) + force
 end
 
-function GetVelocityAtTime(time: number, initialVelocity: Vector3, acceleration: Vector3): Vector3
+local function GetVelocityAtTime(time: number, initialVelocity: Vector3, acceleration: Vector3): Vector3
 	return initialVelocity + acceleration * time
 end
 
-function CloneCastParams(params: RaycastParams): RaycastParams
+local function CloneCastParams(params: RaycastParams): RaycastParams
 	local clone : RaycastParams = RaycastParams.new()
 	clone.CollisionGroup = params.CollisionGroup
 	clone.FilterType = params.FilterType
@@ -52,7 +52,7 @@ function CloneCastParams(params: RaycastParams): RaycastParams
 	return clone
 end
 
-function GetFastCastVisualizationContainer(): Instance
+local function GetFastCastVisualizationContainer(): Instance
 	local fcVisualizationObjects = workspace.Terrain:FindFirstChild(FC_VIS_OBJ_NAME)
 	if fcVisualizationObjects then
 		return fcVisualizationObjects
@@ -65,7 +65,7 @@ function GetFastCastVisualizationContainer(): Instance
 	return fcVisualizationObjects
 end
 
-function GetTrajectoryInfo(
+local function GetTrajectoryInfo(
 	cast: TypeDef.ActiveCast | TypeDef.ActiveBlockCast, 
 	index: number
 ): {[number]: Vector3}
@@ -81,7 +81,7 @@ function GetTrajectoryInfo(
 	return {GetPositionAtTime(duration, origin, vel, accel), GetVelocityAtTime(duration, vel, accel)}
 end
 
-function GetLatestTrajectoryEndInfo(cast: TypeDef.ActiveCast | TypeDef.ActiveBlockCast): {[number]: Vector3}
+local function GetLatestTrajectoryEndInfo(cast: TypeDef.ActiveCast | TypeDef.ActiveBlockCast): {[number]: Vector3}
 	return GetTrajectoryInfo(cast, #cast.StateInfo.Trajectories)
 end
 
