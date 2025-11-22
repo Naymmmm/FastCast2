@@ -415,7 +415,27 @@ function ActiveCast.new(
 
 	---> CosmeticBulletObject GET
 
-	local usingProvider = false
+	local targetContainer: Instance;
+	if cast.Caster.ObjectCache then
+		if cast.RayInfo.CosmeticBulletObject ~= nil then
+			warn("ObjectCache already handle that for you, Template Dupe")
+		end
+		cast.RayInfo.CosmeticBulletObject = cast.Caster.ObjectCache:Invoke(CFrame.new(origin, origin + direction))
+		targetContainer = cast.Caster.CacheHolder
+	else
+		if cast.RayInfo.CosmeticBulletObject ~= nil then
+			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
+			cast.RayInfo.CosmeticBulletObject.CFrame = CFrame.new(origin, origin + direction)
+			cast.RayInfo.CosmeticBulletObject.Parent = behavior.CosmeticBulletContainer
+		end
+		if behavior.CosmeticBulletContainer then
+			targetContainer = behavior.CosmeticBulletContainer
+		else
+			error("CosmeticBulletContainer is nil")
+		end
+	end
+	
+	--[[local usingProvider = false
 	if behavior.CosmeticBulletProvider == nil then
 		if cast.RayInfo.CosmeticBulletObject ~= nil then
 			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
@@ -452,7 +472,7 @@ function ActiveCast.new(
 		end
 	else
 		targetContainer = behavior.CosmeticBulletContainer
-	end
+	end]]
 
 	-- the rest? :P
 
@@ -755,7 +775,7 @@ function ActiveCast:Terminate()
 
 	self.StateInfo.UpdateConnection = nil
 
-	self.Caster.Output:Fire("CastTerminating")
+	self.Caster.Output:Fire("CastTerminating", self)
 	self.Caster.ActiveCastCleaner:Fire(self.ID)
 	
 	self.Caster = nil
