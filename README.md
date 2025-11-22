@@ -1,6 +1,18 @@
 # FastCast2
 An improved version of FastCast with Parallel scripting, more extensions, and statically typed
 
+## How to install
+
+1. Go to https://create.roblox.com/store/asset/87459814880446/FastCast2
+2. Get the module
+3. Go to the Roblox Studio
+4. Click "Toolbox"
+5. In the Toolbox, click Inventory. The module should be in "My Models"
+6. Once you have found it, click it, and now it will be inserted in the workspace. You can put it in any folder
+7. Inside FastCast2, go to FastCastVMs, inside the ClientVM and the ServerVM, you can see a comment telling you to replace the highlighted warning line with the correct path.
+8. Enjoy
+
+
 ## How to setup (Basic)
 
 1. Create a behavior
