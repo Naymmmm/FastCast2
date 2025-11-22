@@ -188,7 +188,7 @@ function FastCast:Init(
 		shared.SharedCasters[self.id] = {}
 		print("SET ID CASTER")
 	end]]
-	print(self.Dispatcher)
+	--print(self.Dispatcher)
 	self.AlreadyInit = true
 end
 
