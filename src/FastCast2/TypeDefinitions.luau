@@ -36,7 +36,20 @@ export type Caster = {
 	AlreadyInit : boolean,
 	--id : string,
 	
-	Init : (Caster, numWorkers : number, newParent : Folder, newName : string,ContainerParent : Folder,VMContainerName : string, VMname : string) -> (),
+	Init : (
+		Caster, 
+		numWorkers : number, 
+		newParent : Folder, 
+		newName : string,
+		ContainerParent : Folder,
+		VMContainerName : string, 
+		VMname : string,
+		
+		useObjectCache : boolean,
+		Template : BasePart | Model,
+		CacheSize : number,
+		CacheHolder : Instance
+	) -> (),
 	
 	RaycastFire: (Caster, Origin : Vector3, Direction : Vector3, Velocity : Vector3 | number, Behavior : FastCastBehavior) -> string,
 	BlockcastFire: (Caster, Origin : Vector3, Size : Vector3, Direction : Vector3, Velocity : Vector3 | number, Behavior : FastCastBehavior) -> string,
@@ -52,7 +65,7 @@ export type FastCastBehavior = {
 	HighFidelityBehavior: number,
 	HighFidelitySegmentSize: number,
 	CosmeticBulletTemplate: Instance?,
-	CosmeticBulletProvider: any, -- any ObjectPool Library Class
+	--CosmeticBulletProvider: any, -- any ObjectPool Library Class(Unused)
 	CosmeticBulletContainer: Instance?,
 	AutoIgnoreContainer: boolean,
 	CanPierceFunction: CanPierceFunction?
@@ -101,7 +114,7 @@ export type CastRayInfo = {
 -- Represents an ActiveCast :: https://etithespirit.github.io/FastCastAPIDocs/fastcast-objects/activecast/
 export type ActiveCast = {
 	--Definition : {[string] : (...any) -> (...any)},
-	Caster : BaseCast,
+	Caster : BaseCastData,
 	StateInfo: CastStateInfo,
 	RayInfo: CastRayInfo,
 	UserData: {[any]: any},
@@ -121,6 +134,8 @@ export type ActiveCast = {
 	Pause : (ActiveCast) -> (),
 	Resume : (ActiveCast) -> (),
 	
+	DestroyObject : (ActiveCast, obj : Instance) -> (),
+	
 	Destroy : (ActiveCast) -> (),
 	Terminate : (ActiveCast) -> (),
 	
@@ -138,7 +153,7 @@ export type BlockCastRayInfo = {
 }
 
 export type ActiveBlockCast = {
-	Caster : BaseCast,
+	Caster : BaseCastData,
 	StateInfo : CastStateInfo,
 	RayInfo : BlockCastRayInfo,
 	UserData : {[any] : any},
@@ -156,6 +171,8 @@ export type ActiveBlockCast = {
 
 	Pause : (ActiveCast) -> (),
 	Resume : (ActiveCast) -> (),
+	
+	DestroyObject : (ActiveCast, obj : Instance) -> (),
 
 	Destroy : (ActiveCast) -> (),
 	Terminate : (ActiveCast) -> (),
@@ -170,12 +187,16 @@ export type BaseCast = {
 		ActiveCast | ActiveBlockCast
 	},
 	Output : BindableEvent,
-	ActiveCastCleaner : BindableEvent
+	ActiveCastCleaner : BindableEvent,
+	ObjectCache : BindableFunction?,
+	CacheHolder : any?
 }
 
 export type BaseCastData = {
 	Output : BindableEvent,
-	ActiveCastCleaner : BindableEvent
+	ActiveCastCleaner : BindableEvent,
+	ObjectCache : BindableFunction?,
+	CacheHolder : any?
 }
 
 return {}
