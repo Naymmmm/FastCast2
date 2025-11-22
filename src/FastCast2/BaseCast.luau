@@ -11,7 +11,7 @@ local TypeDef = require(FastCastM:WaitForChild("TypeDefinitions"))
 local Signal = require(FastCastM:WaitForChild("Signal"))
 local ActiveCast = require(FastCastM:WaitForChild("ActiveCast"))
 local ActiveBlockcast = require(FastCastM:WaitForChild("ActiveBlockcast"))
-local ObjectCache = require(FastCastM:WaitForChild("ObjectCache"))
+--local ObjectCache = require(FastCastM:WaitForChild("ObjectCache"))
 
 -- BaseCast
 local BaseCast = {}
