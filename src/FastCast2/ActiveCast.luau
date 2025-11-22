@@ -395,6 +395,7 @@ function ActiveCast.new(
 		},
 
 		UserData = {},
+		
 		ID = activeCastID
 	}
 	
@@ -410,7 +411,27 @@ function ActiveCast.new(
 	
 	---> CosmeticBulletObject GET
 	
-	local usingProvider = false
+	local targetContainer: Instance;
+	if cast.Caster.ObjectCache then
+		if cast.RayInfo.CosmeticBulletObject ~= nil then
+			warn("ObjectCache already handle that for you, Template Dupe")
+		end
+		cast.RayInfo.CosmeticBulletObject = cast.Caster.ObjectCache:Invoke(CFrame.new(origin, origin + direction))
+		targetContainer = cast.Caster.CacheHolder
+	else
+		if cast.RayInfo.CosmeticBulletObject ~= nil then
+			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
+			cast.RayInfo.CosmeticBulletObject.CFrame = CFrame.new(origin, origin + direction)
+			cast.RayInfo.CosmeticBulletObject.Parent = behavior.CosmeticBulletContainer
+		end
+		if behavior.CosmeticBulletContainer then
+			targetContainer = behavior.CosmeticBulletContainer
+		else
+			error("CosmeticBulletContainer is nil")
+		end
+	end
+	
+	--[[local usingProvider = false
 	if behavior.CosmeticBulletProvider == nil then
 		if cast.RayInfo.CosmeticBulletObject ~= nil then
 			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
@@ -418,7 +439,7 @@ function ActiveCast.new(
 			cast.RayInfo.CosmeticBulletObject.Parent = behavior.CosmeticBulletContainer
 		end
 	else
-		local LIB_GETPART = LookUpTables.Supported_Lib_GETPART[typeof(behavior.CosmeticBulletProvider)]
+		local LIB_GETPART = LookUpTables.Supported_Lib_GETPART[typeof(behavior.CosmeticBulletProvider)] or LookUpTables.Supported_Lib_GETPART[behavior.CosmeticBulletProvider.Type]
 		if cast.RayInfo.CosmeticBulletObject ~= nil then
 			warn("Do not define FastCastBehavior.CosmeticBulletTemplate and FastCastBehavior.CosmeticBulletProvider at the same time! The provider will be used, and CosmeticBulletTemplate will be set to nil.")
 			cast.RayInfo.CosmeticBulletObject = nil
@@ -437,7 +458,7 @@ function ActiveCast.new(
 	---> CosmeticBulletObject Container GET
 	
 	local targetContainer: Instance;
-	local LIB_GETCONTAINER = LookUpTables.Supported_Lib_GETCONTAINER[typeof(behavior.CosmeticBulletProvider)]
+	local LIB_GETCONTAINER = LookUpTables.Supported_Lib_GETCONTAINER[typeof(behavior.CosmeticBulletProvider)] or LookUpTables.Supported_Lib_GETCONTAINER[behavior.CosmeticBulletProvider.Type]
 	
 	if usingProvider then
 		if LIB_GETCONTAINER then
@@ -448,6 +469,7 @@ function ActiveCast.new(
 	else
 		targetContainer = behavior.CosmeticBulletContainer
 	end
+	]]
 	
 	-- the rest? :P
 	
