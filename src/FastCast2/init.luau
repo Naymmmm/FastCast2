@@ -58,6 +58,7 @@ local TypeDef = require(script:WaitForChild("TypeDefinitions"))
 local DefaultConfigs = require(script:WaitForChild("DefaultConfigs"))
 local Configs = require(script:WaitForChild("Configs"))
 local ActiveCast = require(script:WaitForChild("ActiveCast"))
+local ObjectCache = require(script:WaitForChild("ObjectCache"))
 
 --local SharedCasters = require(script:WaitForChild("SharedCasters"))
 
@@ -153,6 +154,7 @@ function FastCast.new() : TypeDef.Caster
 		WorldRoot = workspace,
 		Dispatcher = nil,
 		AlreadyInit = false,
+		
 		--id = HTTPS:GenerateGUID(false)
 	} :: any, FastCast) :: TypeDef.Caster
 end
@@ -163,7 +165,12 @@ function FastCast:Init(
 	newName : string,
 	ContainerParent : Folder,
 	VMContainerName : string,
-	VMname : string
+	VMname : string,
+	
+	useObjectCache : boolean,
+	Template : BasePart | Model,
+	CacheSize : number,
+	CacheHolder : Instance
 )
 	if self.AlreadyInit then warn("Cannot Init more than 1") return end
 	assert(numWorkers > 1, "numWorker must be more than 1")
@@ -175,7 +182,18 @@ function FastCast:Init(
 	local newDispatcher : Dispatcher.Dispatcher = require(DispatcherClone) :: Dispatcher.Dispatcher
 	
 	newDispatcher.Init(ContainerParent,VMContainerName, VMname)
-	self.Dispatcher = newDispatcher.new(numWorkers, nil, function(signalName : string, ...)
+	local data = {
+		useObjectCache = useObjectCache,
+		Template = Template,
+		CacheSize = CacheSize,
+		CacheHolder = CacheHolder
+	}
+	self.ObjectCache = useObjectCache and ObjectCache.new(Template, CacheSize, CacheHolder) :: any
+	local data = {
+		useObjectCache = useObjectCache,
+		CacheHolder = CacheHolder
+	}
+	self.Dispatcher = newDispatcher.new(numWorkers, data, function(signalName : string, ...)
 		self[signalName]:Fire(...)
 	end)
 	
@@ -190,6 +208,20 @@ function FastCast:Init(
 	end]]
 	--print(self.Dispatcher)
 	self.AlreadyInit = true
+	
+	if not useObjectCache then return end
+	
+	repeat task.wait() until #self.Dispatcher.Threads == numWorkers
+	
+	for i, v in self.Dispatcher.Threads do
+		local BindableObjectCache : BindableFunction = v:FindFirstChild("ActiveCastObjectCache") :: BindableFunction
+		if BindableObjectCache then
+			--print("CONNECTED")
+			BindableObjectCache.OnInvoke = function(v : CFrame)
+				return self.ObjectCache:GetPart(v)
+			end
+		end
+	end
 end
 
 function FastCast:RaycastFire(origin: Vector3, direction: Vector3, velocity: Vector3 | number, BehaviorData: TypeDef.FastCastBehavior?)-- : string
@@ -221,6 +253,10 @@ end
 
 function FastCast:SetVisualizeCasts(bool : boolean)
 	Configs.VisualizeCasts = bool
+end
+
+function FastCast:ReturnObject(obj : Instance)
+	self.ObjectCache:ReturnPart(obj)
 end
 
 function FastCast:Destroy()
