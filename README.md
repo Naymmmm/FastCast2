@@ -2,7 +2,7 @@
 An improved version of FastCast with Parallel scripting, more extensions, and statically typed
 
 > [!NOTE]
-> I still have not finished making the API Usage, README.md, so you're gonna learn how to use **FastCast2** by yourself
+> I still have not finished making the API Usage, README.md
 
 ## How to install
 
