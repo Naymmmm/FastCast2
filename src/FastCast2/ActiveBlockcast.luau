@@ -213,8 +213,9 @@ local function SimulateCast(
 	local rayDir = totalDisplacement.Unit * segmentVelocity.Magnitude * delta
 
 	local targetWorldRoot = cast.RayInfo.WorldRoot
-	local resultOfCast = targetWorldRoot:Blockcast(lastPoint, cast.RayInfo.Size, rayDir, cast.RayInfo.Parameters)
+	local resultOfCast = targetWorldRoot:Blockcast(CFrame.new(lastPoint), cast.RayInfo.Size, rayDir, cast.RayInfo.Parameters)
 
+	
 	local point = currentTarget
 	local part: Instance? = nil
 	local material = Enum.Material.Air
@@ -581,7 +582,7 @@ function ActiveCast.new(
 			local rayDir = totalDisplacement.Unit * currentVelocity.Magnitude * delta
 
 			local targetWorldRoot = cast.RayInfo.WorldRoot
-			local resultOfCast = targetWorldRoot:Blockcast(lastPoint, cast.RayInfo.Size, rayDir, cast.RayInfo.Parameters)
+			local resultOfCast = targetWorldRoot:Blockcast(CFrame.new(lastPoint), cast.RayInfo.Size, rayDir, cast.RayInfo.Parameters)
 
 			local point = currentPoint
 
