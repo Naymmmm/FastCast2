@@ -212,16 +212,19 @@ function FastCast:Init(
 	if not useObjectCache then return end
 	
 	repeat task.wait() until #self.Dispatcher.Threads == numWorkers
+	--print("STARTED CONNECTING")
 	
 	for i, v in self.Dispatcher.Threads do
-		local BindableObjectCache : BindableFunction = v:FindFirstChild("ActiveCastObjectCache") :: BindableFunction
+		-- Please dont change this to FindFirstChild, or else diddy will oil you up
+		local BindableObjectCache : BindableFunction = v:WaitForChild("ActiveCastObjectCache") :: BindableFunction
 		if BindableObjectCache then
 			--print("CONNECTED")
 			BindableObjectCache.OnInvoke = function(v : CFrame)
+				--print("INVOKED")
 				return self.ObjectCache:GetPart(v)
-			end
-		end
-	end
+			end -- OH MY GOD
+		end -- KEEP GOING
+	end -- OH YES DADDY
 end
 
 function FastCast:RaycastFire(origin: Vector3, direction: Vector3, velocity: Vector3 | number, BehaviorData: TypeDef.FastCastBehavior?)-- : string
@@ -246,6 +249,7 @@ function FastCast:BlockcastFire(origin : Vector3, Size : Vector3, direction : Ve
 end
 
 function FastCast:SafeCall(f : (...any) -> (...any), ...)
+	-- am i tripping
 	if f then
 		f(...)
 	end
