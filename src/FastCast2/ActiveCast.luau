@@ -468,6 +468,7 @@ function ActiveCast.new(
 		if cast.RayInfo.CosmeticBulletObject ~= nil then
 			warn("ObjectCache already handle that for you, Template Dupe")
 		end
+		-- 1 kebab please
 		cast.RayInfo.CosmeticBulletObject = cast.Caster.ObjectCache:Invoke(CFrame.new(origin, origin + direction))
 		targetContainer = cast.Caster.CacheHolder
 	else
@@ -535,7 +536,7 @@ function ActiveCast.new(
 	
 	local event
 	if RS:IsClient() then
-		event = RS.RenderStepped
+		event = RS.PostSimulation
 	else
 		event = RS.Heartbeat
 	end
