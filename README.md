@@ -111,7 +111,7 @@ Creates a new **FastCastBehavior**, which contains information necessary to fire
 ## Methods
 
 **FastCast:Init(numWorkers, newParent, newName, ContainerParent, VMContainerName, VMname)**\
-Initialize the **Caster** instance and then create a copy of **FastCastVMs**
+Initialize the **Caster** instance and then create a copy of **FastCastVMs**\
 Set its Parent to the specified **newParent**, and rename it to the specified **newName**
 
 # API Examples
