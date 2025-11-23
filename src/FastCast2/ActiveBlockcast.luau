@@ -538,7 +538,7 @@ function ActiveCast.new(
 
 	local event
 	if RS:IsClient() then
-		event = RS.RenderStepped
+		event = RS.PostSimulation
 	else
 		event = RS.Heartbeat
 	end
