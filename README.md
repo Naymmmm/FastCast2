@@ -136,6 +136,10 @@ FastCast:Init(
 
 Initialize the **Caster** instance and then create a copy of **FastCastVMs**\
 Set its Parent to the specified **newParent**, and rename it to the specified **newName**
+and then create a Folder which is a Container of workers, rename it specified **VMContainerName**
+Rename all the workers to the specified **VMname**
+
+**Built-in object pool:** if **useObjectCache** is true, then create an ObjectPool instance, and create a clone **Template** amount of specified **CacheSize**, set its Parent to ContainerFolder that is Parented to specified **CacheHolder** instance
 
 # API Examples
 
