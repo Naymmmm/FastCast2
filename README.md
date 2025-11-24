@@ -120,12 +120,17 @@ Creates a new **FastCastBehavior**, which contains information necessary to fire
 
 ```luau
 FastCast:Init(
-	numWorkers,
-	newParent,
-	newName,
-	ContainerParent,
-	VMContainerName,
-	VMname
+	numWorkers : number,
+	newParent : Folder,
+	newName : string,
+	ContainerParent : Folder,
+	VMContainerName : string,
+	VMname : string,
+
+	useObjectCache : boolean,
+	Template : BasePart | Model,
+	CacheSize : number,
+	CacheHolder : Instance
 )
 ```
 
