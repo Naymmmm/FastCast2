@@ -137,9 +137,32 @@ FastCast:Init(
 Initialize the **Caster** instance and then create a copy of **FastCastVMs**\
 Set its Parent to the specified **newParent**, and rename it to the specified **newName**
 and then create a Folder which is a Container of workers, rename it specified **VMContainerName**
-Rename all the workers to the specified **VMname**
+Clone the number of workers specified by **numWorkers**, and rename all cloned workers to **VMname**
 
 **Built-in object pool:** if **useObjectCache** is true, then create an ObjectPool instance, and create a clone **Template** amount of specified **CacheSize**, set its Parent to ContainerFolder that is Parented to specified **CacheHolder** instance
+
+```luau
+FastCast:RaycastFire(
+	origin: Vector3,
+	direction: Vector3,
+	velocity: Vector3 | number,
+	BehaviorData: FastCastBehavior?
+)
+```
+
+Dispatch a **Raycast** task to **workers**
+
+```luau
+FastCast:BlockcastFire(
+	origin : Vector3,
+	Size : Vector3,
+	direction : Vector3,
+	velocity : Vector3 | number,
+	 BehaviorData: TypeDef.FastCastBehavior?
+)
+```
+
+Dispatch a **Blockcast** task to **workers**
 
 # API Examples
 
