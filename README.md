@@ -158,7 +158,7 @@ FastCast:BlockcastFire(
 	Size : Vector3,
 	direction : Vector3,
 	velocity : Vector3 | number,
-	 BehaviorData: TypeDef.FastCastBehavior?
+	BehaviorData: TypeDef.FastCastBehavior?
 )
 ```
 
