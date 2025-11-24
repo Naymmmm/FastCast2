@@ -2,7 +2,8 @@
 An improved version of FastCast with Parallel scripting, more extensions, and statically typed
 
 > [!NOTE]
-> I still have not finished making the API Usage, README.md
+> - I still have not finished making the API Usage, README.md
+> - This library is still in development and consistently improving
 
 ## How to install
 
