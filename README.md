@@ -164,6 +164,12 @@ FastCast:BlockcastFire(
 
 Dispatch a **Blockcast** task to **workers**
 
+```luau
+FastCast:SafeCall(f : (...any) -> (...any), ...)
+```
+
+Attempt to call the passed-in function with arguments... if it exists, otherwise pass
+
 # API Examples
 
 Function are **unsafe**?, use `Caster:SafeCall(f : (...any) -> (...any), ...)`\
