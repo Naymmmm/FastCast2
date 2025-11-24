@@ -150,7 +150,7 @@ FastCast:RaycastFire(
 )
 ```
 
-Dispatch a **Raycast** task to **workers**
+Dispatch a **Raycast** task to the **workers**
 
 ```luau
 FastCast:BlockcastFire(
@@ -162,7 +162,7 @@ FastCast:BlockcastFire(
 )
 ```
 
-Dispatch a **Blockcast** task to **workers**
+Dispatch a **Blockcast** task to the **workers**
 
 ```luau
 FastCast:SafeCall(f : (...any) -> (...any), ...)
