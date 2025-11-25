@@ -40,8 +40,8 @@
 --]]
 
 --[[
-	- Author : Mawin CK
-	- Date : 2025
+	- Modified Author: Mawin CK
+	- Date: 2025
 ]]
 
 --!strict
