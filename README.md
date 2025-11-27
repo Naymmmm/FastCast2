@@ -1,9 +1,11 @@
 <p align="center">
   <img width="500" height="225" alt="FastCast2CoverTrans" src="https://github.com/user-attachments/assets/dcb6f17c-0e3e-46c2-b694-432a6ef867ac" />
 </p>
-<p>
+
 <h1>FastCast2 (Unofficial) </h1>
 <strong>An improved version of FastCast with Parallel scripting, more extensions, and statically typed</strong>
+
+&nbsp;
 
 > [!NOTE]
 > - I still have not finished making the API Usage, README.md
@@ -120,13 +122,17 @@ FastCast.new()
 ```
 
 Construct a new **Caster** instance, which represents an entire gun or other projectile launching system.
-
+<br>
+<br>
+<br>
 
 ```luau
 FastCast.newBehavior()
 ```
 
 Creates a new **FastCastBehavior**, which contains information necessary to fire the cast properly.
+
+<br>
 
 ## Methods
 
@@ -153,6 +159,9 @@ Clone the number of workers specified by **numWorkers**, and rename all cloned w
 
 **Built-in object pool:** if **useObjectCache** is true, then create an ObjectPool instance, and create a clone **Template** amount of specified **CacheSize**, set its Parent to ContainerFolder that is Parented to specified **CacheHolder** instance
 
+<br>
+<br>
+
 ```luau
 FastCast:RaycastFire(
 	origin: Vector3,
@@ -163,6 +172,9 @@ FastCast:RaycastFire(
 ```
 
 Dispatch a **Raycast** task to the **workers**
+
+<br>
+<br>
 
 ```luau
 FastCast:BlockcastFire(
@@ -176,17 +188,26 @@ FastCast:BlockcastFire(
 
 Dispatch a **Blockcast** task to the **workers**
 
+<br>
+<br>
+
 ```luau
 FastCast:SafeCall(f : (...any) -> (...any), ...)
 ```
 
 Attempt to call the passed-in function with arguments... if it exists, otherwise pass
 
+<br>
+<br>
+
 ```luau
 FastCast:SetVisualizeCasts(bool : boolean)
 ```
 
 Set **VisualizeCasts** to the specified boolean
+
+<br>
+<br>
 
 ```luau
 FastCast:ReturnObject(obj : Instance)
@@ -196,14 +217,22 @@ Return passed-in **obj** to **ObjectCache** if it is a valid **obj** instance fr
 > [!warning]
 > You must **useObjectCache** when initializing, or else you will get an error
 
+<br>
+<br>
+
 ```luau
 FastCast:Destroy()
 ```
 Destroy **Caster** instance, which includes: **ObjectCache**, **Dispatcher**
 
+<br>
+<br>
+
 ## Properties
 
-## WorldRoot
+```luau
+Caster.WorldRoot
+```
 The target **WorldRoot** that this Caster runs in by default. Its default value is **workspace**.
 > [!NOTE]
 > Changing this value will not update any existing ActiveCasts during runtime.
@@ -267,4 +296,3 @@ end
 - @avibah On Discord: **For helping me make VMDispatcher**
 - @ace9b472eeec4f53ba9e8d91bo87c636 On Discord: **For advice/ideas**
 
-</p>
