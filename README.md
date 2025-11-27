@@ -2,8 +2,9 @@
   <img width="500" height="225" alt="FastCast2CoverTrans" src="https://github.com/user-attachments/assets/dcb6f17c-0e3e-46c2-b694-432a6ef867ac" />
 </p>
 
-<h1>FastCast2 (Unofficial) </h1>
-<strong>An improved version of FastCast with Parallel scripting, more extensions, and statically typed</strong>
+# FastCast2 (Unofficial) 
+**An improved, modernized version of [EternityDev's FastCast](https://github.com/1ForeverHD/FastCast)**  
+with **Parallel Luau scripting**, **static typing**, **more extensions**, **built-in object pooling**, and significantly better performance.
 
 &nbsp;
 
