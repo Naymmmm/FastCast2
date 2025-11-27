@@ -1,9 +1,9 @@
 <p align="center">
   <img width="500" height="225" alt="FastCast2CoverTrans" src="https://github.com/user-attachments/assets/dcb6f17c-0e3e-46c2-b694-432a6ef867ac" />
 </p>
-
-# FastCast2 (Unofficial)
-An improved version of FastCast with Parallel scripting, more extensions, and statically typed
+<p>
+<h1>FastCast2 (Unofficial) </h1>
+<strong>An improved version of FastCast with Parallel scripting, more extensions, and statically typed</strong>
 
 > [!NOTE]
 > - I still have not finished making the API Usage, README.md
@@ -23,17 +23,20 @@ An improved version of FastCast with Parallel scripting, more extensions, and st
 
 https://github.com/user-attachments/assets/157b0829-b56a-48c8-ad08-bb37dd8c3215
 
-## How to set up (Basic example)
+## Basic setup
 
 1. **In StarterCharacterScripts, insert a LocalScript, rename it to anything**
 
-2. **Inside the LocalScript, require the FastCast2**
+2. **Inside the LocalScript, paste this**
 ```luau
-local FastCast = require(PathTo.FastCastModule)
-```
 
-3. **Create a behavior**
-```luau
+local FastCast = require(PathTo.FastCastModule)
+
+-- Templates (create these in ReplicatedStorage or wherever you like)
+local BulletTemplate = PathTo:WaitForChild("BulletTemplate")
+local ProjectileContainer = PathTo:WaitForChild("Projectiles")
+
+-- Create a behavior 
 local CastParams = RaycastParams.new()
 CastParams.FilterType = Enum.RaycastFilterType.Exclude
 CastParams.FilterDescendantsInstances = {character}
@@ -45,10 +48,8 @@ behavior.CosmeticBulletTemplate = BulletTemplate
 behavior.CosmeticBulletContainer = ProjectileContainer
 behavior.Acceleration = Vector3.new(0, -workspace.Gravity, 0)
 behavior.AutoIgnoreContainer = true
-```
 
-4. **Create Caster and initialize**
-```luau
+-- Create Caster and initialize
 local Caster = FastCast.new()
 Caster:Init(
 	12, -- numWorkers
@@ -58,11 +59,9 @@ Caster:Init(
 	"VMsContainer", -- Name Folder of workerFolder
 	"CastWorkers" -- Name of workers
 )
-```
 
-5. **Connecting events**
-```luau
--- Local functions
+-- Connecting events
+
 local function OnRayHit(
 	ActiveCast, 
 	resultOfCast : RaycastResult, 
@@ -93,10 +92,18 @@ local function OnCastTerminating(cast)
 	end
 end
 
--- Listeners
 Caster.LengthChanged:Connect(OnLengthChanged)
 Caster.CastTerminating:Connect(OnCastTerminating)
 Caster.RayHit:Connect(OnRayHit)
+
+--[[
+To Fire, do something like this :
+local origin = OriginPart.Position
+local direction = (TargetPart.Position - origin).Unit
+
+Caster:RaycastFire(origin, direction, 300, behavior) -- 300 studs/sec
+]]
+
 ```
 
 6. Enjoy, see more [samples](https://github.com/weenachuangkud/FastCast2/tree/main/samples)
@@ -259,3 +266,5 @@ end
 # SPECIAL THANKS TO
 - @avibah On Discord: **For helping me make VMDispatcher**
 - @ace9b472eeec4f53ba9e8d91bo87c636 On Discord: **For advice/ideas**
+
+</p>
