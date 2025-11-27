@@ -15,14 +15,11 @@ with **Parallel Luau scripting**, **static typing**, **more extensions**, **buil
 
 ## How to install
 
-1. Go to https://create.roblox.com/store/asset/87459814880446/FastCast2
-2. Get the module
-3. Go to the Roblox Studio
-4. Click "Toolbox"
-5. In the Toolbox, click Inventory. The module should be in "My Models"
-6. Once you have found it, click it, and now it will be inserted in the workspace. You can put it in any folder
-7. Inside FastCast2, go to FastCastVMs, inside the ClientVM and the ServerVM, you can see a comment telling you to replace the highlighted warning line with the correct path.
-8. Enjoy
+1. Get the model: https://create.roblox.com/store/asset/87459814880446/FastCast2
+2. Open **Toolbox → Inventory → My Models**
+3. Insert **FastCast2** into your place (you can put it anywhere, e.g., ReplicatedStorage)
+4. Inside `FastCast2 → FastCastVMs`, open both **ClientVM** and **ServerVM**  
+   → Replace the highlighted warning line with the correct path to your FastCast2 module
 
 https://github.com/user-attachments/assets/157b0829-b56a-48c8-ad08-bb37dd8c3215
 
