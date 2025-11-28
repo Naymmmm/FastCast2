@@ -3,8 +3,8 @@
 </p>
 
 # FastCast2 (Unofficial) 
-**An improved, modernized version of [EternityDev's FastCast](https://github.com/1ForeverHD/FastCast)**  
-with **Parallel Luau scripting**, **static typing**, **more extensions**, **built-in object pooling**, and significantly better performance.
+**An improved version of [FastCast](https://github.com/1ForeverHD/FastCast)**  
+with **Parallel Luau scripting**, **static typing**, **more extensions**, **built-in object pooling**
 
 &nbsp;
 
