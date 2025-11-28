@@ -263,6 +263,8 @@ RayHit:Connect(
 	segmentVelocity : Vector3,
 	cosmeticBulletObject : Instance?
 ```
+Thread Safety level: **Unsafe**
+
 This event fires when any ray fired by this **Caster** runs into something and will be subsequently terminated
 -  **ActiveCast** that fired this event
 -  **RaycastResult** is the result of the ray that caused this hit to occur
@@ -271,7 +273,27 @@ This event fires when any ray fired by this **Caster** runs into something and w
 -  **segmentVelocity** is the velocity of the bullet at the time of the hit
 -  **cosmeticBulletObject** is a reference to the passed-in cosmetic bullet. This will not fire if the ray hits nothing and instead reaches its maximum distance.
 
+```luau
+RayPierced:Connect(
+	ActiveCast : ActiveCast,
+	result : RaycastResult,
+	segmentVelocity : Vector3,
+	cosmeticBulletObject : Instance?
+)
+```
+This functions absolutely identically to **RayHit**, with the exception that it instead fires when the ray pierces something. This will never fire if **canPierceFunction** is nil.
 
+<br>
+<br>
+
+```luau
+CastTerminating:Connect(
+	ActiveCast : ActiveCast
+)
+```
+Safety level: **Unsafe**
+
+This event fires while a ray is terminating
 
 # API Examples
 
