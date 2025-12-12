@@ -40,11 +40,10 @@
 --]]
 
 --[[
-	- Modified Author: Mawin CK
-	- Date: 2025
+	- Modified Author : Mawin CK
+	- Date : 2025
 ]]
 
---!strict
 
 -- Services
 --local HTTPS = game:GetService("HttpService")
@@ -103,7 +102,7 @@ FastCast.__type = "FastCast"
 	</p>
 ]]
 function FastCast.newBehavior() : TypeDef.FastCastBehavior
-	return DefaultConfigs.FastCastBehavior
+	return DefaultConfigs.FastCastBehavior :: TypeDef.FastCastBehavior
 end
 
 local DEFAULT_FASTCAST_BEHAVIOR = FastCast.newBehavior()
