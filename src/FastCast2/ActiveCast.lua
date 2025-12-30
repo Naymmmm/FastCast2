@@ -23,11 +23,6 @@ local Configs = require(FastCastModule:WaitForChild("Configs"))
 -- CONSTs
 local MAX_PIERCE_TEST_COUNT = 100
 local FC_VIS_OBJ_NAME = "FastCastVisualizationObjects"
-local DEFAULT_MAX_DISTANCE = 1000
-
---- So silly - Mawin CK 2025
--- When using high fidelity mode, this will prevent it from taking too long 
-local MAX_HIGHFIDE_CAST_TIME = 0.016 * 5
 
 
 --- ActiveCast
@@ -234,7 +229,10 @@ local function SimulateCast(
 	
 	task.synchronize()
 	
-	SendLengthChanged(cast, lastPoint, rayDir.Unit, rayDisplacement, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
+	
+	if cast.StateInfo.UseLengthChanged then
+		SendLengthChanged(cast, lastPoint, rayDir.Unit, rayDisplacement, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
+	end
 	cast.StateInfo.DistanceCovered += rayDisplacement
 
 	local rayVisualization: ConeHandleAdornment? = nil
@@ -248,9 +246,11 @@ local function SimulateCast(
 		PrintDebug("Hit something, testing now.")
 
 		if (cast.RayInfo.CanPierceCallback ~= nil) then
-			if expectingShortCall == false and cast.StateInfo.IsActivelySimulatingPierce then
-				cast:Terminate()
-				error("ERROR: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
+			if expectingShortCall == false then
+				if (cast.StateInfo.IsActivelySimulatingPierce) then
+					cast:Terminate()
+					error("ERROR: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
+				end
 			end
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
@@ -289,8 +289,6 @@ local function SimulateCast(
 
 					local subDisplacement = (subPosition - (subPosition + subVelocity)).Magnitude
 
-					-- TODO : Who tf coded this shit
-					--- TODO : It was not Mawin_CK coded this but some furry coded this shit
 					if (subResult ~= nil) then
 						local subDisplacement = (subPosition - subResult.Position).Magnitude
 						local dbgSeg = DbgVisualizeSegment(CFrame.new(subPosition, subPosition + subVelocity), subDisplacement)
@@ -440,13 +438,14 @@ function ActiveCast.new(
 					Acceleration = behavior.Acceleration
 				}
 			},
+			UseLengthChanged = behavior.UseLengthChanged
 			--OnParallel = false
 		},
 
 		RayInfo = {
 			Parameters = behavior.RaycastParams,
 			WorldRoot = workspace,
-			MaxDistance = behavior.MaxDistance or DEFAULT_MAX_DISTANCE,
+			MaxDistance = behavior.MaxDistance or 1000,
 			CosmeticBulletObject = behavior.CosmeticBulletTemplate,
 			CanPierceCallback = behavior.CanPierceFunction
 		},
@@ -484,8 +483,6 @@ function ActiveCast.new(
 		end
 		if behavior.CosmeticBulletContainer then
 			targetContainer = behavior.CosmeticBulletContainer
-		else
-			error("CosmeticBulletContainer is nil")
 		end
 	end
 	
@@ -541,7 +538,7 @@ function ActiveCast.new(
 	
 	local event
 	if RS:IsClient() then
-		event = RS.PostSimulation
+		event = behavior.SimulateAfterPhysic and RS.Heartbeat or RS.PostSimulation
 	else
 		event = RS.Heartbeat
 	end
@@ -617,7 +614,7 @@ function ActiveCast.new(
 			if getmetatable(cast) == nil then return end
 			cast.StateInfo.IsActivelyResimulating = false
 
-			if (tick() - timeAtStart) > MAX_HIGHFIDE_CAST_TIME then
+			if (tick() - timeAtStart) > 0.016 * 5 then
 				warn("Extreme cast lag encountered! Consider increasing HighFidelitySegmentSize.")
 			end
 		else
@@ -632,7 +629,7 @@ end
 
 -- ... Wow?
 
-local function ModifyTransformation(cast: ActiveCast, velocity: Vector3?, acceleration: Vector3?, position: Vector3?)
+local function ModifyTransformation(cast: TypeDef.ActiveCast, velocity: Vector3?, acceleration: Vector3?, position: Vector3?)
 	local trajectories = cast.StateInfo.Trajectories
 	local lastTrajectory = trajectories[#trajectories]
 
