@@ -229,10 +229,7 @@ local function SimulateCast(
 	
 	task.synchronize()
 	
-	
-	if cast.StateInfo.UseLengthChanged then
-		SendLengthChanged(cast, lastPoint, rayDir.Unit, rayDisplacement, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
-	end
+	SendLengthChanged(cast, lastPoint, rayDir.Unit, rayDisplacement, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
 	cast.StateInfo.DistanceCovered += rayDisplacement
 
 	local rayVisualization: ConeHandleAdornment? = nil
@@ -246,11 +243,9 @@ local function SimulateCast(
 		PrintDebug("Hit something, testing now.")
 
 		if (cast.RayInfo.CanPierceCallback ~= nil) then
-			if expectingShortCall == false then
-				if (cast.StateInfo.IsActivelySimulatingPierce) then
-					cast:Terminate()
-					error("ERROR: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
-				end
+			if expectingShortCall == false and cast.StateInfo.IsActivelySimulatingPierce then
+				cast:Terminate()
+				error("ERROR: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
 			end
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
@@ -438,7 +433,6 @@ function ActiveCast.new(
 					Acceleration = behavior.Acceleration
 				}
 			},
-			UseLengthChanged = behavior.UseLengthChanged
 			--OnParallel = false
 		},
 
@@ -483,6 +477,8 @@ function ActiveCast.new(
 		end
 		if behavior.CosmeticBulletContainer then
 			targetContainer = behavior.CosmeticBulletContainer
+		else
+			error("CosmeticBulletContainer is nil")
 		end
 	end
 	
@@ -538,7 +534,7 @@ function ActiveCast.new(
 	
 	local event
 	if RS:IsClient() then
-		event = behavior.SimulateAfterPhysic and RS.Heartbeat or RS.PostSimulation
+		event = RS.PostSimulation
 	else
 		event = RS.Heartbeat
 	end
@@ -629,7 +625,7 @@ end
 
 -- ... Wow?
 
-local function ModifyTransformation(cast: TypeDef.ActiveCast, velocity: Vector3?, acceleration: Vector3?, position: Vector3?)
+local function ModifyTransformation(cast: ActiveCast, velocity: Vector3?, acceleration: Vector3?, position: Vector3?)
 	local trajectories = cast.StateInfo.Trajectories
 	local lastTrajectory = trajectories[#trajectories]
 
