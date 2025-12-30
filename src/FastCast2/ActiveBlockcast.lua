@@ -293,6 +293,8 @@ local function SimulateCast(
 
 					local subDisplacement = (subPosition - (subPosition + subVelocity)).Magnitude
 
+					-- TODO : Who tf coded this shit
+					--- TODO : It was not Mawin_CK coded this but some furry coded this shit
 					if (subResult ~= nil) then
 						local subDisplacement = (subPosition - subResult.Position).Magnitude
 						local dbgSeg = DbgVisualizeSegment(CFrame.new(subPosition, subPosition + subVelocity), BlockcastSize, subDisplacement)
