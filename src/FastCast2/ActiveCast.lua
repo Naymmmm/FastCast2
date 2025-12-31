@@ -49,6 +49,15 @@ ActiveCast.__type = "ActiveCast"
 
 -----> Local functions
 
+local function DebrisAdd(obj : Instance, Lifetime : number)
+	if not obj then return end
+	if Lifetime <= 0 then obj:Destroy() end
+	
+	task.delay(Lifetime, function()
+		obj:Destroy()
+	end)
+end
+
 local function GetPositionAtTime(time: number, origin: Vector3, initialVelocity: Vector3, acceleration: Vector3): Vector3
 	local force = Vector3.new((acceleration.X * time^2) / 2,(acceleration.Y * time^2) / 2, (acceleration.Z * time^2) / 2)
 	return origin + (initialVelocity * time) + force
@@ -115,9 +124,12 @@ local function DbgVisualizeSegment(castStartCFrame: CFrame, castLength: number) 
 	adornment.CFrame = castStartCFrame
 	adornment.Height = castLength
 	adornment.Color3 = Color3.new()
-	adornment.Radius = 0.25
+	-- Hey dude, if you want to edit this, just edit it idc - Mawin_CK 2025
+	adornment.Radius = 0.10
 	adornment.Transparency = 0.5
 	adornment.Parent = GetFastCastVisualizationContainer()
+	
+	DebrisAdd(adornment, 1)
 	return adornment
 end
 
@@ -126,6 +138,7 @@ local function DbgVisualizeHit(atCF: CFrame, wasPierce: boolean): SphereHandleAd
 	local adornment = Instance.new("SphereHandleAdornment")
 	adornment.Adornee = workspace.Terrain
 	adornment.CFrame = atCF
+	-- Alert! someone is Mawining it!!!!!
 	adornment.Radius = 0.4
 	adornment.Transparency = 0.25
 	adornment.Color3 = (wasPierce == false) and DBG_HIT_COLOR or DBG_RAYPIERCE_COLOR
