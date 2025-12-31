@@ -19,6 +19,7 @@ local TypeDef = require(FastCastModule:WaitForChild("TypeDefinitions"))
 local ErrorMsgs = require(script.Parent:WaitForChild("ErrorMessage"))
 --local MathUtil = require(UtilityModule.Math)
 local Configs = require(FastCastModule:WaitForChild("Configs"))
+local DebugLogging = Configs.DebugLogging
 --local LookUpTables = require(FastCastModule:WaitForChild("LookUpTables"))
 
 ----> CONSTs
@@ -97,11 +98,11 @@ end
 
 ---> Debugging
 
-local function PrintDebug(message : string)
+--[[local function PrintDebug(message : string)
 	if Configs.DebugLogging then
 		print(message)
 	end
-end
+end]]
 
 local function DbgVisualizeSegment(castStartCFrame: CFrame, castLength: number) : ConeHandleAdornment?
 	if Configs.VisualizeCasts ~= true then return nil end
@@ -197,7 +198,10 @@ local function SimulateCast(
 )
 	assert(cast.StateInfo.UpdateConnection ~= nil, ErrorMsgs.ERR_OBJECT_DISPOSED)
 	
-	PrintDebug("Casting for frame.")
+	--PrintDebug("Casting for frame.")
+	if DebugLogging.Casting then
+		print("Casting for frame.")
+	end
 	
 	local latestTrajectory = cast.StateInfo.Trajectories[#cast.StateInfo.Trajectories]
 
@@ -253,7 +257,10 @@ local function SimulateCast(
 
 	if part and part ~= cast.RayInfo.CosmeticBulletObject then
 		local start = tick()
-		PrintDebug("Hit something, testing now.")
+		--PrintDebug("Hit something, testing now.")
+		if DebugLogging.Hit then
+			print("Hit something, testing now.")
+		end
 
 		if (cast.RayInfo.CanPierceCallback ~= nil) then
 			if expectingShortCall == false then
@@ -266,7 +273,12 @@ local function SimulateCast(
 		end
 
 		if cast.RayInfo.CanPierceCallback == nil or (cast.RayInfo.CanPierceCallback ~= nil and cast.RayInfo.CanPierceCallback(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false) then
-			PrintDebug("Piercing function is nil or it returned FALSE to not pierce this hit.")
+			--PrintDebug("Piercing function is nil or it returned FALSE to not pierce this hit.")
+			
+			if DebugLogging.RayPierce then
+				print("Piercing function is nil or it returned FALSE to not pierce this hit.")	
+			end
+			
 			cast.StateInfo.IsActivelySimulatingPierce = false
 
 			if (cast.StateInfo.HighFidelityBehavior == 2 and latestTrajectory.Acceleration ~= Vector3.new() and cast.StateInfo.HighFidelitySegmentSize ~= 0) then
@@ -279,7 +291,11 @@ local function SimulateCast(
 
 				cast.StateInfo.IsActivelyResimulating = true
 
-				PrintDebug("Hit was registered, but recalculation is on for physics based casts. Recalculating to verify a real hit...")
+				--PrintDebug("Hit was registered, but recalculation is on for physics based casts. Recalculating to verify a real hit...")
+
+				if DebugLogging.Calculation then
+					print("Hit was registered, but recalculation is on for physics based casts. Recalculating to verify a real hit...")
+				end
 
 				local numSegmentsDecimal = rayDisplacement / cast.StateInfo.HighFidelitySegmentSize
 				local numSegmentsReal = math.floor(numSegmentsDecimal)
@@ -335,14 +351,24 @@ local function SimulateCast(
 				cast:Terminate()
 				error("Invalid value " .. (cast.StateInfo.HighFidelityBehavior) .. " for HighFidelityBehavior.")
 			else
-				PrintDebug("Hit was successful. Terminating.")
+				--PrintDebug("Hit was successful. Terminating.")
+				
+				if DebugLogging.Hit then
+					print("Hit was successful. Terminating.")
+				end
+				
 				SendRayHit(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
 				cast:Terminate()
 				DbgVisualizeHit(CFrame.new(point), false)
 				return
 			end
 		else
-			PrintDebug("Piercing function returned TRUE to pierce this part.")
+			--PrintDebug("Piercing function returned TRUE to pierce this part.")
+			
+			if DebugLogging.RayPierce then
+				print("Piercing function returned TRUE to pierce this part.")
+			end
+			
 			if rayVisualization ~= nil then
 				rayVisualization.Color3 = Color3.new(0.4, 0.05, 0.05)
 			end
@@ -398,7 +424,12 @@ local function SimulateCast(
 			cast.StateInfo.IsActivelySimulatingPierce = false
 
 			if brokeFromSolidObject then
-				PrintDebug("Broke because the ray hit something solid (" .. tostring(resultOfCast.Instance) .. ") while testing for a pierce. Terminating the cast.")
+				--PrintDebug("Broke because the ray hit something solid (" .. tostring(resultOfCast.Instance) .. ") while testing for a pierce. Terminating the cast.")
+				
+				if DebugLogging.Hit then
+					print("Broke because the ray hit something solid (" .. tostring(resultOfCast.Instance) .. ") while testing for a pierce. Terminating the cast.")
+				end
+				
 				SendRayHit(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
 				cast:Terminate()
 				DbgVisualizeHit(CFrame.new(resultOfCast.Position), false)
@@ -431,6 +462,9 @@ function ActiveCast.new(
 	if (behavior.HighFidelitySegmentSize <= 0) then
 		error("Cannot set FastCastBehavior.HighFidelitySegmentSize <= 0!", 0)
 	end
+	
+	
+	
 	
 	local cast : TypeDef.ActiveCast = {
 		Caster = BaseCast,
@@ -564,7 +598,12 @@ function ActiveCast.new(
 	local function Stepped(delta : number)
 		if cast.StateInfo.Paused then return end
 		
-		PrintDebug("Casting for frame.")
+		--PrintDebug("Casting for frame.")
+		
+		if DebugLogging.Casting then
+			print("Casting for frame.")
+		end
+		
 		local latestTrajectory = cast.StateInfo.Trajectories[#cast.StateInfo.Trajectories]
 		if (cast.StateInfo.HighFidelityBehavior == 3 and latestTrajectory.Acceleration ~= Vector3.new() and cast.StateInfo.HighFidelitySegmentSize > 0) then
 
@@ -623,7 +662,12 @@ function ActiveCast.new(
 					cast.StateInfo.CancelHighResCast = false
 					break
 				end
-				PrintDebug("[" .. segmentIndex .. "] Subcast of time increment " .. timeIncrement)
+				
+				if DebugLogging.Segment then
+					print("[" .. segmentIndex .. "] Subcast of time increment " .. timeIncrement)
+				end
+				
+				--PrintDebug("[" .. segmentIndex .. "] Subcast of time increment " .. timeIncrement)
 				SimulateCast(cast, timeIncrement, true)
 			end
 
