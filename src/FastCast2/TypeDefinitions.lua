@@ -2,6 +2,7 @@
 	- Author : Mawin CK
 	- Date : 2025
 ]]
+
 --!strict
 
 -- Requires
@@ -32,6 +33,7 @@ export type Caster = {
 	RayHit: RBXScriptSignal,
 	RayPierced: RBXScriptSignal,
 	CastTerminating: RBXScriptSignal,
+	CastFire: RBXScriptSignal,
 	Dispatcher : Dispatcher.Dispatcher,
 	AlreadyInit : boolean,
 	--id : string,
@@ -70,7 +72,12 @@ export type FastCastBehavior = {
 	AutoIgnoreContainer: boolean,
 	CanPierceFunction: CanPierceFunction?,
 	UseLengthChanged : boolean,
-	SimulateAfterPhysic : boolean
+	SimulateAfterPhysic : boolean,
+	
+	AutomaticPerformance : boolean,
+	AdaptivePerformance : {
+		
+	}
 }
 
 -- Represents a CastTrajectory :: https://etithespirit.github.io/FastCastAPIDocs/fastcast-objects/casttrajectory/
