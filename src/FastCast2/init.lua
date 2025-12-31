@@ -39,8 +39,10 @@
 	Make the caster once, then use the caster to fire your bullets. Do not make a caster for each bullet.
 --]]
 
+-- Mozilla Public License 2.0 (files originally from FastCast)
+
 --[[
-	- Modified Author : Mawin CK
+	- Modified by: Mawin CK 
 	- Date : 2025
 ]]
 
@@ -150,6 +152,7 @@ function FastCast.new() : TypeDef.Caster
 		RayHit = Signal.new(),
 		RayPierced = Signal.new(),
 		CastTerminating = Signal.new(),
+		CastFire = Signal.new(),
 		WorldRoot = workspace,
 		Dispatcher = nil,
 		AlreadyInit = false,
@@ -193,7 +196,14 @@ function FastCast:Init(
 		CacheHolder = CacheHolder
 	}
 	self.Dispatcher = newDispatcher.new(numWorkers, data, function(signalName : string, ...)
-		self[signalName]:Fire(...)
+		local f = self[signalName]
+		if not f then return end
+		
+		if type(f) == "function" then
+			f(...)
+		else
+			f:Fire(...)
+		end
 	end)
 	
 	-- Idk who tf write this
