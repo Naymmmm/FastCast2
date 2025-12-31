@@ -7,12 +7,12 @@
 local Configs = {}
 
 Configs.DebugLogging = {
-	Casting = true,
-	Segment = true,
-	Hit = true,
-	RayPierce = true,
-	Calculation = true,
+	Casting = false,
+	Segment = false,
+	Hit = false,
+	RayPierce = false,
+	Calculation = false,
 }
-Configs.VisualizeCasts = false
+Configs.VisualizeCasts = true
 
 return Configs
