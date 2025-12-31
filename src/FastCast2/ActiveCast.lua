@@ -214,6 +214,23 @@ local function SendLengthChanged(
 	)
 end
 
+local function SendCastFire(
+	cast : TypeDef.ActiveCast,
+	origin : Vector3, 
+	direction : Vector3,
+	velocity : Vector3 | number, 
+	behavior : TypeDef.FastCastBehavior
+)
+	cast.Caster.Output:Fire(
+		"CastFire",
+		cast,
+		origin, 
+		direction,
+		velocity,
+		behavior
+	)
+end
+
 local function SimulateCast(
 	cast : TypeDef.ActiveCast, 
 	delta : number, 
@@ -629,6 +646,8 @@ function ActiveCast.new(
 			cast.RayInfo.Parameters.FilterDescendantsInstances = igroneList
 		end
 	end
+	
+	SendCastFire(cast, origin, direction, velocity, behavior)
 	
 	local event
 	if RS:IsClient() then
