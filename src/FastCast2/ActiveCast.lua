@@ -332,8 +332,15 @@ local function SimulateCast(
 				local numSegmentsDecimal = rayDisplacement / cast.StateInfo.HighFidelitySegmentSize
 				local numSegmentsReal = math.floor(numSegmentsDecimal)
 				--local realSegmentLength = rayDisplacement / numSegmentsReal
+				
+				if numSegmentsReal == 0 then numSegmentsReal = 1 end
 
 				local timeIncrement = delta / numSegmentsReal
+				
+				if DebugLogging.Calculation then
+					print("Performing subcast! Time increment: " .. timeIncrement .. ", num segments: " .. numSegmentsReal)
+				end
+				
 				for segmentIndex = 1, numSegmentsReal do
 					if cast.StateInfo.CancelHighResCast then
 						cast.StateInfo.CancelHighResCast = false
@@ -653,7 +660,7 @@ function ActiveCast.new(
 
 			if cast.StateInfo.IsActivelyResimulating then
 				cast:Terminate()
-				error("Cascading cast lag encountered! The caster attempted to perform a high fidelity cast before the previous one completed, resulting in exponential cast lag. Consider increasing HighFidelitySegmentSize.")
+				warn("Cascading cast lag encountered! The caster attempted to perform a high fidelity cast before the previous one completed, resulting in exponential cast lag. Consider increasing HighFidelitySegmentSize.")
 			end
 
 			cast.StateInfo.IsActivelyResimulating = true
@@ -697,6 +704,10 @@ function ActiveCast.new(
 			end
 
 			local timeIncrement = delta / numSegmentsReal
+			
+			if DebugLogging.Calculation then
+				print("Performing subcast! Time increment: " .. timeIncrement .. ", num segments: " .. numSegmentsReal)
+			end
 
 			for segmentIndex = 1, numSegmentsReal do
 				if getmetatable(cast) == nil then return end
