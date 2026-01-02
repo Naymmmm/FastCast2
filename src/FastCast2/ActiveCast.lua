@@ -26,7 +26,8 @@ local FastCastEnums = require(FastCastModule:WaitForChild("FastCastEnums"))
 ----> CONSTs
 local MAX_PIERCE_TEST_COUNT = 100
 local FC_VIS_OBJ_NAME = "FastCastVisualizationObjects"
-local MAX_SEGMENT_CAL_TIME = 0.016 * 5
+local MAX_SEGMENT_CAL_TIME = 0.016 * 5 -- 80ms
+local MAX_CASTING_TIME = 0.2 -- 200ms
 
 -- DEBUG
 local DBG_SEGMENT_SUB_COLOR = Color3.new(0.286275, 0.329412, 0.247059)
@@ -43,6 +44,9 @@ local DBG_RAYPIERCE_COLOR = Color3.new(1, 0.2, 0.2)
 
 local DBG_RAY_LIFETIME = 1
 local DBG_HIT_LIFETIME = 1
+
+-- Automatic Performance setting
+local HIGH_FIDE_INCREASE_SIZE = 0.5
 
 --- ActiveCast
 
@@ -304,9 +308,7 @@ local function SimulateCast(
 
 	--print("2C")
 	
-	-- If you're seeing some shitty code. Mawin_CK did not write these
-	-- It was some software engineer furry written this
-	--- My mom said im special - Mawin_CK 2025
+	-- I feel so gay
 
 	if part and part ~= cast.RayInfo.CosmeticBulletObject then
 		local start = tick()
@@ -318,7 +320,7 @@ local function SimulateCast(
 		if (cast.RayInfo.CanPierceCallback ~= nil) then
 			if expectingShortCall == false and cast.StateInfo.IsActivelySimulatingPierce then
 				cast:Terminate()
-				error("ERROR: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
+				warn("WARN: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
 			end
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
@@ -339,7 +341,7 @@ local function SimulateCast(
 
 				if cast.StateInfo.IsActivelyResimulating then
 					cast:Terminate()
-					error("Cascading cast lag encountered! The caster attempted to perform a high fidelity cast before the previous one completed, resulting in exponential cast lag. Consider increasing HighFidelitySegmentSize.")
+					warn("Cascading cast lag encountered! The caster attempted to perform a high fidelity cast before the previous one completed, resulting in exponential cast lag. Consider increasing HighFidelitySegmentSize.")
 				end
 
 				cast.StateInfo.IsActivelyResimulating = true
@@ -375,8 +377,7 @@ local function SimulateCast(
 
 					local subDisplacement = (subPosition - (subPosition + subVelocity)).Magnitude
 
-					-- Do not blame Mawin_CK for this. he did not write these codes
-					--- Blame the furry who  made this mess
+					-- What?
 					if (subResult ~= nil) then
 
 						local subDisplacement = (subPosition - subResult.Position).Magnitude
@@ -527,8 +528,13 @@ function ActiveCast.new(
 	if (behavior.HighFidelitySegmentSize <= 0) then
 		error("Cannot set FastCastBehavior.HighFidelitySegmentSize <= 0!", 0)
 	end
-
-
+	
+	-- This world is cruel, and I must accept it.
+	if behavior.HighFidelityBehavior <= 0 then
+		behavior.HighFidelityBehavior = 1
+	elseif behavior.HighFidelityBehavior >= 4 then
+		behavior.HighFidelityBehavior = 3
+	end
 
 
 	local cast : TypeDef.ActiveCast = {
@@ -671,16 +677,18 @@ function ActiveCast.new(
 		if DebugLogging.Casting then
 			print("Casting for frame.")
 		end
+		
+		local Cast_timeAtStart = tick()
 
 		local latestTrajectory = cast.StateInfo.Trajectories[#cast.StateInfo.Trajectories]
-
+		
 		if typeof(latestTrajectory.Acceleration) ~= "Vector3" then
 			latestTrajectory.Acceleration = Vector3.new()
 		end
 
 		if (cast.StateInfo.HighFidelityBehavior == FastCastEnums.HighFidelityBehavior.Always and cast.StateInfo.HighFidelitySegmentSize > 0) then
 
-			local timeAtStart = tick()
+			local Segment_timeAtStart = tick()
 
 			if cast.StateInfo.IsActivelyResimulating then
 				cast:Terminate()
@@ -751,11 +759,23 @@ function ActiveCast.new(
 			if getmetatable(cast) == nil then return end
 			cast.StateInfo.IsActivelyResimulating = false
 
-			if (tick() - timeAtStart) > MAX_SEGMENT_CAL_TIME then
-				warn("Extreme cast lag encountered! Consider increasing HighFidelitySegmentSize.")
+			if behavior.AutomaticPerformance and (tick() - Segment_timeAtStart) > MAX_SEGMENT_CAL_TIME then
+				local HighFideSizeAmount = behavior.AdaptivePerformance.HighFidelitySegmentSizeIncrease or HIGH_FIDE_INCREASE_SIZE
+				
+				if DebugLogging.AutomaticPerformance then
+					warn("AutomaticPerformance increasing size of HighFidelitySize by : ", HighFideSizeAmount)
+				end
+				
+				cast.StateInfo.HighFidelitySegmentSize += HighFideSizeAmount
 			end
 		else
 			SimulateCast(cast, delta, false)
+		end
+		
+		if behavior.AutomaticPerformance and behavior.AdaptivePerformance.LowerHighFidelityBehavior and (tick() - Cast_timeAtStart) > MAX_CASTING_TIME then
+			if cast.StateInfo.HighFidelityBehavior > 1 then
+				cast.StateInfo.HighFidelityBehavior -= 1
+			end
 		end
 	end
 
