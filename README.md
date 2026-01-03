@@ -233,6 +233,9 @@ FastCast:RaycastFire(origin: Vector3, direction: Vector3, velocity: Vector3 | nu
 ```
 Create a new `ActiveCast`; it will not work if the `Caster` has not initialized
 
+<br>
+<br>
+
 ```luau
 FastCast:BlockcastFire(origin : Vector3, Size : Vector3, direction : Vector3, velocity : Vector3 | number, BehaviorData: TypeDef.FastCastBehavior?)
 ```
