@@ -112,8 +112,8 @@ Caster:Init(
 	"CastVMs", -- New name of cloned FastCastVMs
 	RepFirst, -- VMs Container
 	"CastVMsContainer", -- Name of VMs Container
-	"CastVM",
-	true
+	"CastVM", -- Name of VMs
+	true -- useBulkMoveTo
 )
 
 -- Event functions
