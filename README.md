@@ -9,7 +9,7 @@ with **Parallel Luau scripting**, **static typing**, **more extensions**, **buil
 &nbsp;
 
 > [!NOTE]
-> - I still have not finished making the API Usage, README.md 100%
+> - I still have not finished making the API Usage, README.md 100% yet
 
 ## How to install
 1. Go to the toolbox 
