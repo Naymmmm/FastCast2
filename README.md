@@ -161,6 +161,9 @@ FastCast.new()
 ```
 Construct a new Caster instance
 
+<br>
+<br>
+
 ```luau
 FastCast:Init(
 	numWorkers : number, 
