@@ -154,7 +154,7 @@ end)
 
 # API Usages
 
-## Methods
+## Caster Methods
 
 ```luau
 FastCast.new()
@@ -181,6 +181,30 @@ FastCast:Init(
 Initialize Caster. Allocate the worker amount of `numWorkers`, rename it to `VMname`, clone `FastCastVMs` to `newParent`, rename it to `newName` , and then create a VMsContainer which is a container of workers, set its parent to `ContainerParent`, and rename it to `VMContainerName`
 - useBulkMoveTo: if true, will enable BulkMoveTo to handle CFrame changes for every `ActiveCast.RayInfo.CosmeticBulletObject`. Can be disabled and enabled by `Caster:BindBulkMoveTo(boolean)`
 - useObjectCache: if true, will permanently use ObjectCache for Caster
+
+<br>
+<br>
+
+```luau
+FastCast:SafeCall(f : (...any) -> (...any), ...)
+```
+Call the passed-in function if it exists
+
+<br>
+<br>
+
+```luau
+FastCast:BindBulkMoveTo(bool : boolean)
+```
+Enable or disable `BulkMoveTo` for `Caster`
+
+<br>
+<br>
+
+```luau
+FastCast:SetVisualizeCasts(bool : boolean)
+```
+Set `Configs.VisualizeCasts = bool`
 
 # SPECIAL THANKS TO
 - @avibah On Discord: **For helping me make VMDispatcher**
