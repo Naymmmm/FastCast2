@@ -19,6 +19,8 @@ What the benefits of **using** FastCast2 :
 * Built-in ObjectCache
 * Flexible
 
+Follow on (devforum)[https://devforum.roblox.com/t/fastcast2-an-improved-version-of-fastcast-with-parallel-scripting-more-extensions-and-statically-typed/4093890]
+
 &nbsp;
 
 > [!NOTE]
