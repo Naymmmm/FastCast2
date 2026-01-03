@@ -144,6 +144,7 @@ UIS.InputBegan:Connect(function(input : InputObject, gp : boolean)
 	end
 end)
 ```
+- Or you can get FastCast2 testing ground from : https://github.com/weenachuangkud/FastCast2/releases
 
 # SPECIAL THANKS TO
 - @avibah On Discord: **For helping me make VMDispatcher**
