@@ -272,6 +272,14 @@ Caster.CastTerminating(ActiveCast)
 ```
 Fires every CastTerminating
 
+<br>
+<br>
+
+```luau
+Caster.CastFire(ActiveCast, Origin : Vector3, Direction : Vector3, Velocity : Vector3, behavior : FastCastBehavior)
+```
+Fires if `ActiveCast` is created successfully before the RunService
+
 # SPECIAL THANKS TO
 - @avibah On Discord: **For helping me make VMDispatcher**
 - @ace9b472eeec4f53ba9e8d91bo87c636 On Discord: **For advice/ideas**
