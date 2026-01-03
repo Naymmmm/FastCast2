@@ -12,312 +12,35 @@ with **Parallel Luau scripting**, **static typing**, **more extensions**, **buil
 > - I still have not finished making the API Usage, README.md
 
 ## How to install
+1. Go to the toolbox 
+<img width="43" height="51" alt="Screenshot 2026-01-04 012731" src="https://github.com/user-attachments/assets/41851631-06cf-4ab3-a2cc-d1af66c317ef" />
 
-1. Get the model: https://create.roblox.com/store/asset/87459814880446/FastCast2
-2. Open **Toolbox → Inventory → My Models**
-3. Insert **FastCast2** into your place (you can put it anywhere, e.g., ReplicatedStorage)
-4. Inside `FastCast2 → FastCastVMs`, open both **ClientVM** and **ServerVM**  
-   → Replace the highlighted warning line with the correct path to your FastCast2 module
+2. Inside the toolbox, model tab. Search for "FastCast2"
+<img width="292" height="36" alt="Screenshot 2026-01-04 012824" src="https://github.com/user-attachments/assets/c1010991-f481-405d-b9e6-9230cd2104ac" />
 
-https://github.com/user-attachments/assets/157b0829-b56a-48c8-ad08-bb37dd8c3215
+3. You should see FastCast2 and then click it
+<img width="275" height="330" alt="Screenshot 2026-01-04 012904" src="https://github.com/user-attachments/assets/d1252231-834a-4407-b2bb-facdd18ffd06" />
 
-## Basic setup
+4. Make sure it's owned by "Mawin_CK"
+<img width="109" height="51" alt="Screenshot 2026-01-04 012926" src="https://github.com/user-attachments/assets/b10dd12b-e389-41d7-b72f-1eb291c492f3" />
 
-1. **In StarterCharacterScripts, insert a LocalScript, rename it to anything**
+5. Insert into the studio
+<img width="273" height="48" alt="Screenshot 2026-01-04 012943" src="https://github.com/user-attachments/assets/1586939e-1627-4b22-8a42-c1c149f54bf7" />
 
-2. **Inside the LocalScript, paste this**
-```luau
+6. If you're seeing this. Click "OK"
+<img width="494" height="150" alt="Screenshot 2026-01-04 013009" src="https://github.com/user-attachments/assets/87abd09c-69c8-4e77-8327-a3c192626de7" />
 
-local FastCast = require(PathTo.FastCastModule)
+7. Now you will see "FastCast2" inside the workspace. Drag it into ReplicatedStorage
+<img width="201" height="126" alt="Screenshot 2026-01-04 013047" src="https://github.com/user-attachments/assets/88ec449a-ee11-4930-8775-c9deb5453264" />
 
--- Templates (create these in ReplicatedStorage or wherever you like)
-local BulletTemplate = PathTo:WaitForChild("BulletTemplate")
-local ProjectileContainer = PathTo:WaitForChild("Projectiles")
+8. Make sure inside the FastCast2. The "ClientVM" and "ServerVM" path is correct
+<img width="185" height="298" alt="Screenshot 2026-01-04 013134" src="https://github.com/user-attachments/assets/9910a3bd-1705-43ce-8c50-4cab0f096146" />
+<img width="449" height="49" alt="Screenshot 2026-01-04 013203" src="https://github.com/user-attachments/assets/cf4355d9-9faf-432c-9fde-7ed9b8b1675b" />
 
--- Create a behavior 
-local CastParams = RaycastParams.new()
-CastParams.FilterType = Enum.RaycastFilterType.Exclude
-CastParams.FilterDescendantsInstances = {character}
-CastParams.IgnoreWater = true
+9. Insert a part into the workspace and then rename it to "Projectile" and set its size to 1,1,1, and make sure "CanCollide", "CanQuery", "CanTouch" are all unmarked. And drag it into ReplicatedStorage
+<img width="194" height="59" alt="Screenshot 2026-01-04 013358" src="https://github.com/user-attachments/assets/19be90fd-66ce-4cf5-849d-ab84d718edd8" />
 
-local behavior = FastCast.newBehavior()
-behavior.RaycastParams = CastParams
-behavior.CosmeticBulletTemplate = BulletTemplate
-behavior.CosmeticBulletContainer = ProjectileContainer
-behavior.Acceleration = Vector3.new(0, -workspace.Gravity, 0)
-behavior.AutoIgnoreContainer = true
 
--- Create Caster and initialize
-local Caster = FastCast.new()
-Caster:Init(
-	12, -- numWorkers
-	player, -- Where VMs Stored
-	"CastVMs", -- Name of VMs
-	CastVMsContainer, -- Where workers stored
-	"VMsContainer", -- Name Folder of workerFolder
-	"CastWorkers" -- Name of workers
-)
-
--- Connecting events
-
-local function OnRayHit(
-	ActiveCast, 
-	resultOfCast : RaycastResult, 
-	segmentVelocity : Vector3, 
-	segmentAcceleration : Vector3, 
-	cosmeticBulletObject : Instance?
-)
-	FastCast:SafeCall(ActiveCast.Terminate)
-end
-
-local function OnLengthChanged(
-	ActiveCast, 
-	lastPoint : Vector3, 
-	rayDir : Vector3, 
-	rayDisplacement : number, 
-	segmentVelocity : Vector3, 
-	cosmeticBulletObject : Instance?
-)
-	if cosmeticBulletObject then
-		cosmeticBulletObject.CFrame = CFrame.new(lastPoint, lastPoint + rayDir) * CFrame.new(0, 0, -rayDisplacement / 2)
-	end
-end
-
-local function OnCastTerminating(cast)
-	if cast.RayInfo.CosmeticBulletObject then
-		cast.RayInfo.CosmeticBulletObject:Destroy()
-		cast.RayInfo.CosmeticBulletObject = nil
-	end
-end
-
-Caster.LengthChanged:Connect(OnLengthChanged)
-Caster.CastTerminating:Connect(OnCastTerminating)
-Caster.RayHit:Connect(OnRayHit)
-
---[[
-To Fire, do something like this :
-local origin = OriginPart.Position
-local direction = (TargetPart.Position - origin).Unit
-
-Caster:RaycastFire(origin, direction, 300, behavior) -- 300 studs/sec
-]]
-
-```
-
-6. Enjoy, see more [samples](https://github.com/weenachuangkud/FastCast2/tree/main/samples)
-
-# API Usages
-
-## Constructor
-> [!warning]
-> Do not create a new caster every time your weapon fires! This is a common mistake people make. Doing this will cause severe performance problems and unexpected behavior in the  module.\
-> Remember - A caster is like a gun. Creating a caster every time the weapon is fired is like buying a new gun every time you want to fire a bullet.
-
-```luau
-FastCast.new()
-```
-
-Construct a new **Caster** instance, which represents an entire gun or other projectile launching system.
-<br>
-<br>
-<br>
-
-```luau
-FastCast.newBehavior()
-```
-
-Creates a new **FastCastBehavior**, which contains information necessary to fire the cast properly.
-
-
-## Methods
-
-```luau
-FastCast:Init(
-	numWorkers : number,
-	newParent : Folder,
-	newName : string,
-	ContainerParent : Folder,
-	VMContainerName : string,
-	VMname : string,
-
-	useObjectCache : boolean,
-	Template : BasePart | Model,
-	CacheSize : number,
-	CacheHolder : Instance
-)
-```
-
-Initialize the **Caster** instance and then create a copy of **FastCastVMs**\
-Set its Parent to the specified **newParent**, and rename it to the specified **newName**
-and then create a Folder which is a Container of workers, rename it specified **VMContainerName**
-Clone the number of workers specified by **numWorkers**, and rename all cloned workers to **VMname**
-
-**Built-in object pool:** if **useObjectCache** is true, then create an ObjectPool instance, and create a clone **Template** amount of specified **CacheSize**, set its Parent to ContainerFolder that is Parented to specified **CacheHolder** instance
-
-<br>
-<br>
-
-```luau
-FastCast:RaycastFire(
-	origin: Vector3,
-	direction: Vector3,
-	velocity: Vector3 | number,
-	BehaviorData: FastCastBehavior?
-)
-```
-
-Dispatch a **Raycast** task to the **workers**
-
-<br>
-<br>
-
-```luau
-FastCast:BlockcastFire(
-	origin : Vector3,
-	Size : Vector3,
-	direction : Vector3,
-	velocity : Vector3 | number,
-	BehaviorData: TypeDef.FastCastBehavior?
-)
-```
-
-Dispatch a **Blockcast** task to the **workers**
-
-<br>
-<br>
-
-```luau
-FastCast:SafeCall(f : (...any) -> (...any), ...)
-```
-
-Attempt to call the passed-in function with arguments... if it exists, otherwise pass
-
-<br>
-<br>
-
-```luau
-FastCast:SetVisualizeCasts(bool : boolean)
-```
-
-Set **VisualizeCasts** to the specified boolean
-
-<br>
-<br>
-
-```luau
-FastCast:ReturnObject(obj : Instance)
-```
-
-Return passed-in **obj** to **ObjectCache** if it is a valid **obj** instance from ObjectCache, otherwise do nothing
-> [!warning]
-> You must **useObjectCache** when initializing, or else you will get an error
-
-<br>
-<br>
-
-```luau
-FastCast:Destroy()
-```
-Destroy **Caster** instance, which includes: **ObjectCache**, **Dispatcher**
-
-<br>
-<br>
-
-## Properties
-
-```luau
-Caster.WorldRoot
-```
-The target **WorldRoot** that this Caster runs in by default. Its default value is **workspace**.
-> [!NOTE]
-> Changing this value will not update any existing ActiveCasts during runtime.
-> When an ActiveCast is instantiated by a Caster, it looks at this property to see what it should set its own WorldRoot property to (see CastRayInfo), and then from there onward, it uses its own property to determine where to simulate.
-
-
-## Events
-
-```luau
-LengthChanged:Connect(
-	ActiveCast : ActiveCast,
-	lastPoint : Vector3,
-	rayDir : Vector3,
-	displacement : Vector3,
-	segmentVelocity : Vector3,
-	cosmeticBulletObject : Instance?
-)
-```
-Safety level: **intermediate**
-
-This event fires every time any ray fired by this **Caster** updates and moves
-- **lastPoint** parameter is the point the ray was at before it was moved
-- **rayDir** represents the direction of movement, and displacement represents how far it moved in that direction. To calculate the current point, use **lastPoint + (rayDir * displacement)**
-- **segmentVelocity** represents the velocity of the bullet at the time this event fired.
-- **cosmeticBulletObject** is a reference to the cosmetic bullet passed into the Fire method (or nil if no such object was passed in)
-
-<br>
-<br>
-
-```luau
-RayHit:Connect(
-	ActiveCast : ActiveCast,
-	result : RaycastResult,
-	segmentVelocity : Vector3,
-	cosmeticBulletObject : Instance?
-```
-Thread Safety level: **Unsafe**
-
-This event fires when any ray fired by this **Caster** runs into something and will be subsequently terminated
--  **ActiveCast** that fired this event
--  **RaycastResult** is the result of the ray that caused this hit to occur
-> [!NOTE]
-> The **RaycastResult** passed into this event will never be nil.
--  **segmentVelocity** is the velocity of the bullet at the time of the hit
--  **cosmeticBulletObject** is a reference to the passed-in cosmetic bullet. This will not fire if the ray hits nothing and instead reaches its maximum distance.
-
-<br>
-<br>
-
-```luau
-RayPierced:Connect(
-	ActiveCast : ActiveCast,
-	result : RaycastResult,
-	segmentVelocity : Vector3,
-	cosmeticBulletObject : Instance?
-)
-```
-This functions absolutely identically to **RayHit**, with the exception that it instead fires when the ray pierces something. This will never fire if **canPierceFunction** is nil.
-
-<br>
-<br>
-
-```luau
-CastTerminating:Connect(
-	ActiveCast : ActiveCast
-)
-```
-Safety level: **Unsafe**
-
-This event fires while a ray is terminating
-
-# API Examples
-
-Function are **unsafe**?, use `Caster:SafeCall(f : (...any) -> (...any), ...)`\
-**Q:** How do you know that the function is not safe to call?\
-**A:** You're going to run the game first, to test if it will throw an error at you or not\
-If so, meaning, the functions are **unsafe**\
-**Q:** Why It's **unsafe** in this example?\
-**A:** Because it attempts to call a nil (function does not exist, even though it should)
-```luau
-local function OnRayHit(
-	ActiveCast : TypeDef.ActiveCast, 
-	resultOfCast : RaycastResult, 
-	segmentVelocity : Vector3, 
-	segmentAcceleration : Vector3, 
-	cosmeticBulletObject : Instance?
-)
-	FastCast:SafeCall(ActiveCast.Terminate)
-end
-```
 # SPECIAL THANKS TO
 - @avibah On Discord: **For helping me make VMDispatcher**
 - @ace9b472eeec4f53ba9e8d91bo87c636 On Discord: **For advice/ideas**
