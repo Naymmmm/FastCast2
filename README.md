@@ -8,6 +8,10 @@ with **Parallel Luau scripting**, **static typing**, **more extensions**, **buil
 
 ---
 
+**FastCast2** It's a projectiles library powered by [VMsDispatcher](https://github.com/weenachuangkud/VMsDispatcher) meant to **simulate** projectiles without any **physic replication**
+
+<br>
+
 What the benefits of **using** FastCast2 :
 
 * More customizable
@@ -215,14 +219,6 @@ Call the passed-in function if it exists
 FastCast:BindBulkMoveTo(bool : boolean)
 ```
 Enable or disable `BulkMoveTo` for `Caster`
-
-<br>
-<br>
-
-```luau
-FastCast:SetVisualizeCasts(bool : boolean)
-```
-Set `Configs.VisualizeCasts = bool`
 
 <br>
 <br>
