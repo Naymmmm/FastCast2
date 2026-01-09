@@ -301,6 +301,9 @@ function FastCast:Destroy()
 	if self.ObjectCache then
 		self.ObjectCache:Destroy()
 	end
+	if self.ObjectCacheConnection then
+		self.ObjectCacheConnection.OnInvoke = nil
+	end
 	self.Dispatcher:Destroy()
 	setmetatable(self, nil)
 end
