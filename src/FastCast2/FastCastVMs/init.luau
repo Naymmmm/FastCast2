@@ -7,15 +7,15 @@
 -- Modded by Mawin_CK
 -- Desc : I make it more customizable and more easy to use :P
 
----- Services ----
+-- Services --
 
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
 
----- Imports ----
+-- Imports --
 
----- Settings ----
+-- Settings --
 
 local IS_SERVER = RunService:IsServer()
 
@@ -36,8 +36,10 @@ export type Dispatcher = {
 }
 
 local ServerScript : Script = script:WaitForChild("ServerVM")
+ServerScript:SetAttribute("FastCast2Module", script.Parent)
 
 local LocalScript : LocalScript = script:WaitForChild("ClientVM")
+LocalScript:SetAttribute("FastCast2Module", script.Parent)
 
 --[[
 	Those are Default
@@ -57,7 +59,7 @@ local Server = true
 
 local UseBindableEvent = true
 
----- Constants ----
+-- Constants --
 
 local Dispatcher = {}
 Dispatcher.__index = Dispatcher
@@ -70,15 +72,15 @@ local ControllerName = ""
 local ContainerName = ""
 local ContainerParent = (IS_SERVER and ServerContainerParent or ClientContainerParent)
 
----- Variables ----
+-- Variables --
 
 local AlreadyInit = false
 
 
----- Private Functions ----
+-- Private Functions --
 
 
----- Public Functions ----
+-- Public Functions --
 
 --[[
 	<p>
@@ -97,7 +99,7 @@ function Dispatcher.Init(ContainerParent : Instance, VMContainerName : string, V
 	if IS_SERVER and not Server or not Client then return end
 	if AlreadyInit then return end
 	
-	---> Init
+	-- Init
 	
 	local Actor = Instance.new("Actor")
 	Actor:SetAttribute("Tasks", 0)
@@ -115,14 +117,14 @@ function Dispatcher.Init(ContainerParent : Instance, VMContainerName : string, V
 		Controller = LocalScript and LocalScript:Clone()
 	end
 	
-	---> Setup
+	-- Setup
 	
 	ControllerName = VMname
 	ContainerName = VMContainerName
 	ContainerParent = ContainerParent
 	
 	
-	---> Start
+	-- Start
 
 	assert(Controller, "Controller script not found or not valid")
 

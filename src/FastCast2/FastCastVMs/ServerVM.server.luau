@@ -9,7 +9,7 @@ local Rep = game:GetService("ReplicatedStorage")
 -- Modules
 
 -- REPLACE WITH ACTUAL PATH
-local FastCast2Module = Rep:WaitForChild("FastCast2")
+local FastCast2Module = script:GetAttribute("FastCast2Module")
 
 -- Requires
 
