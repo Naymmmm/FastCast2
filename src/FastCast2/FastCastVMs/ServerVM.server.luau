@@ -6,7 +6,7 @@
 -- Modules
 
 -- REPLACE WITH ACTUAL PATH
-local Rep = game:GetService("ReplicatedStoraage")
+local Rep = game:GetService("ReplicatedStorage")
 local FastCast2Module = Rep:WaitForChild("FastCast2")
 
 local TypeDef = require(FastCast2Module:WaitForChild("TypeDefinitions"))
