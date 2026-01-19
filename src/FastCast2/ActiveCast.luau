@@ -40,7 +40,12 @@ local DBG_RAYPIERCE_SUB_COLOR = Color3.new(1, 0.113725, 0.588235)
 -- Automatic Performance setting
 local HIGH_FIDE_INCREASE_SIZE = 0.5
 
--- ActiveCast
+--[=[
+	@class ActiveCast
+
+	An ActiveCast represents a bullet fired by a parent [Caster](Caster). It contains methods of accessing the physics 
+	data of this specific bullet at any given time, as well as methods to alter its trajectory during runtime.
+]=]
 
 local ActiveCast = {}
 
@@ -504,7 +509,28 @@ local function SimulateCast(
 	end
 end
 
--- ActiveCast functions
+--[=[
+	@function new
+	@private
+	@within ActiveCast
+
+	Creates a new ActiveCast instance with the given parameters.
+	Don't use this method! Instead, use [Caster:RaycastFire()](TypeDefinitions#Caster) to create ActiveCasts.
+
+	@param BaseCast TypeDef.BaseCastData -- The base cast data used to initialize the active cast.
+
+	@param activeCastID string -- Unique identifier for this active cast.
+
+	@param origin Vector3 -- The starting position of the cast.
+
+	@param direction Vector3 -- The direction the cast will travel in.
+
+	@param velocity Vector3 | number -- The velocity of the cast (either directional or scalar).
+
+	@param behavior TypeDef.FastCastBehavior -- The FastCast behavior configuration.
+
+	@return ActiveCast -- The newly created ActiveCast instance.
+]=]
 
 function ActiveCast.new(
 	BaseCast : TypeDef.BaseCastData,
@@ -825,13 +851,28 @@ local function ModifyTransformation(cast: TypeDef.ActiveCast, velocity: Vector3?
 end
 
 
--- same as ActiveCast:Terminate()
+--[=[
+
+Destroys an ActiveCast, terminating it's simulation, firing the CastTerminating event, and cleaning up resources. 
+This is the equivilant of calling `ActiveCast:Terminate()`.
+
+@method Destroy
+@within ActiveCast
+
+]=]
 function ActiveCast:Destroy()
 	ActiveCast:Terminate()
 end
 
--- SET
+--[=[
 
+Sets the velocity of an ActiveCast to the specified Vector3.
+
+@method SetVelocity
+@param velocity Vector3 -- The new velocity to set.
+@within ActiveCast
+
+]=]
 function ActiveCast:SetVelocity(velocity : Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -844,6 +885,15 @@ function ActiveCast:SetVelocity(velocity : Vector3)
 	ModifyTransformation(self, velocity, nil, nil)
 end
 
+--[=[
+
+Sets the acceleration of an ActiveCast to the specified Vector3.
+
+@method SetAcceleration
+@param acceleration Vector3 -- The new acceleration to set.
+@within ActiveCast
+
+]=]
 function ActiveCast:SetAcceleration(acceleration: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -856,8 +906,14 @@ function ActiveCast:SetAcceleration(acceleration: Vector3)
 	ModifyTransformation(self, nil, acceleration, nil)
 end
 
--- GET
+--[=[
 
+Gets the velocity of an ActiveCast.
+
+@method GetVelocity
+@within ActiveCast
+@return Vector3 -- The current velocity of the ActiveCast.
+]=]
 function ActiveCast:GetVelocity() : Vector3
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -871,6 +927,15 @@ function ActiveCast:GetVelocity() : Vector3
 	return GetVelocityAtTime(self.StateInfo.TotalRuntime - currentTrajectory.StartTime, currentTrajectory.InitialVelocity, currentTrajectory.Acceleration)
 end
 
+--[=[
+
+Gets the acceleration of an ActiveCast.
+
+@method GetAcceleration
+@within ActiveCast
+@return Vector3 -- The current acceleration of the ActiveCast.
+
+]=]
 function ActiveCast:GetAcceleration(): Vector3
 	assert(getmetatable(self) == ActiveCast, 
 		ErrorMsgs.ERR_NOT_INSTANCE:format("GetAcceleration", "ActiveCast.new(...)")
@@ -883,6 +948,14 @@ function ActiveCast:GetAcceleration(): Vector3
 	return currentTrajectory.Acceleration
 end
 
+--[=[
+
+Gets the position of an ActiveCast.
+
+@method GetPosition
+@within ActiveCast
+@return Vector3 -- The current position of the ActiveCast.
+]=]
 function ActiveCast:GetPosition(): Vector3
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -896,8 +969,15 @@ function ActiveCast:GetPosition(): Vector3
 	return GetPositionAtTime(self.StateInfo.TotalRuntime - currentTrajectory.StartTime, currentTrajectory.Origin, currentTrajectory.InitialVelocity, currentTrajectory.Acceleration)
 end
 
--- Add
+--[=[
 
+Add velocity to an ActiveCast with the specified Vector3.
+
+@method AddVelocity
+@param velocity Vector3 -- The new velocity to add.
+@within ActiveCast
+
+]=]
 function ActiveCast:AddVelocity(velocity: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -910,6 +990,15 @@ function ActiveCast:AddVelocity(velocity: Vector3)
 	self:SetVelocity(self:GetVelocity() + velocity)
 end
 
+--[=[
+
+Add acceleration to an ActiveCast with the specified Vector3.
+
+@method AddAcceleration
+@param acceleration Vector3 -- The new acceleration to add.
+@within ActiveCast
+
+]=]
 function ActiveCast:AddAcceleration(acceleration: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -922,6 +1011,15 @@ function ActiveCast:AddAcceleration(acceleration: Vector3)
 	self:SetAcceleration(self:GetAcceleration() + acceleration)
 end
 
+--[=[
+
+Add position to an ActiveCast with the specified Vector3.
+
+@method AddPosition
+@param position Vector3 -- The new position to add.
+@within ActiveCast
+
+]=]
 function ActiveCast:AddPosition(position: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -934,8 +1032,14 @@ function ActiveCast:AddPosition(position: Vector3)
 	self:SetPosition(self:GetPosition() + position)
 end
 
--- Others
+--[=[
 
+Pauses simulation for an ActiveCast.
+
+@method Pause
+@within ActiveCast
+
+]=]
 function ActiveCast:Pause()
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -948,6 +1052,14 @@ function ActiveCast:Pause()
 	self.StateInfo.Paused = true
 end
 
+--[=[
+
+Resumes simulation for an ActiveCast if it was paused previously.
+
+@method Resume
+@within ActiveCast
+
+]=]
 function ActiveCast:Resume()
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -960,6 +1072,15 @@ function ActiveCast:Resume()
 	self.StateInfo.Paused = false
 end
 
+--[=[
+
+Terminates an ActiveCast, firing the CastTerminating event, and cleaning up resources. 
+This is the equivilant of calling `Active:Destroy()`.
+
+@method Resume
+@within ActiveCast
+
+]=]
 function ActiveCast:Terminate()
 	assert(
 		getmetatable(self) == ActiveCast, 

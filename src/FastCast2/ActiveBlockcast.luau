@@ -40,7 +40,8 @@ local HIGH_FIDE_INCREASE_SIZE = 0.5
 --[=[
 	@class ActiveBlockCast
 
-	TODO: Document ActiveBlockCast
+	An ActiveBlockCast represents a BlockCast fired by a parent [Caster](Caster). It contains methods of accessing the physics 
+	data of this specific BlockCast at any given time, as well as methods to alter its trajectory during runtime.
 ]=]
 
 local ActiveCast = {}
@@ -479,37 +480,28 @@ local function SimulateCast(
 end
 
 --[=[
-	@method new
+	@function new
 	@within ActiveBlockCast
 
-	Creates a new ActiveCast instance with the given parameters.
+	Creates a new ActiveBlockCast instance with the given parameters.
 	This is the fancy part where numbers and vectors start cooperating.
 
-	@param BaseCast TypeDef.BaseCastData
-	The base cast data used to initialize the active cast.
+	@param BaseCast TypeDef.BaseCastData -- The base cast data used to initialize the active cast.
 
-	@param activeCastID string
-	Unique identifier for this active cast.
+	@param activeCastID string -- Unique identifier for this active cast.
 
-	@param origin Vector3
-	The starting position of the cast.
+	@param origin Vector3 -- The starting position of the cast.
 
-	@param size Vector3
-	The size of the cast volume.
+	@param size Vector3 -- The size of the cast volume.
 
-	@param direction Vector3
-	The direction the cast will travel in.
+	@param direction Vector3 -- The direction the cast will travel in.
 
-	@param velocity Vector3 | number
-	The velocity of the cast (either directional or scalar).
+	@param velocity Vector3 | number -- The velocity of the cast (either directional or scalar).
 
-	@param behavior TypeDef.FastCastBehavior
-	The FastCast behavior configuration.
+	@param behavior TypeDef.FastCastBehavior -- The FastCast behavior configuration.
 
-	@return TypeDef.ActiveCast
-	The newly created ActiveCast instance.
+	@return TypeDef.ActiveCast -- The newly created ActiveCast instance.
 ]=]
-
 
 function ActiveCast.new(
 	BaseCast : TypeDef.BaseCastData,
@@ -817,13 +809,28 @@ local function ModifyTransformation(cast: TypeDef.ActiveBlockCast, velocity: Vec
 end
 
 
--- same as ActiveCast:Terminate()
+--[=[
+
+Destroys an ActiveBlockCast, terminating it's simulation, firing the CastTerminating event, and cleaning up resources. 
+This is the equivilant of calling `ActiveBlockCast:Terminate()`.
+
+@method Destroy
+@within ActiveBlockCast
+
+]=]
 function ActiveCast:Destroy()
 	ActiveCast:Terminate()
 end
 
--- SET
+--[=[
 
+Sets the velocity of an ActiveBlockCast to the specified Vector3.
+
+@method SetVelocity
+@param velocity Vector3 -- The new velocity to set.
+@within ActiveBlockCast
+
+]=]
 function ActiveCast:SetVelocity(velocity : Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -836,6 +843,14 @@ function ActiveCast:SetVelocity(velocity : Vector3)
 	ModifyTransformation(self, velocity, nil, nil)
 end
 
+--[=[
+
+Sets the acceleration of an ActiveBlockCast to the specified Vector3.
+
+@method SetAcceleration
+@param acceleration Vector3 -- The new acceleration to set.
+@within ActiveBlockCast
+]=]
 function ActiveCast:SetAcceleration(acceleration: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -848,8 +863,14 @@ function ActiveCast:SetAcceleration(acceleration: Vector3)
 	ModifyTransformation(self, nil, acceleration, nil)
 end
 
--- GET
+--[=[
 
+Gets the velocity of an ActiveBlockCast.
+
+@method GetVelocity
+@within ActiveBlockCast
+@return Vector3 -- The current velocity of the ActiveBlockCast.
+]=]
 function ActiveCast:GetVelocity() : Vector3
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -863,6 +884,14 @@ function ActiveCast:GetVelocity() : Vector3
 	return GetVelocityAtTime(self.StateInfo.TotalRuntime - currentTrajectory.StartTime, currentTrajectory.InitialVelocity, currentTrajectory.Acceleration)
 end
 
+--[=[
+
+Gets the acceleration of an ActiveBlockCast.
+
+@method GetAcceleration
+@within ActiveBlockCast
+@return Vector3 -- The current acceleration of the ActiveBlockCast.
+]=]
 function ActiveCast:GetAcceleration(): Vector3
 	assert(getmetatable(self) == ActiveCast, 
 		"ERR_NOT_INSTANCE"
@@ -875,6 +904,14 @@ function ActiveCast:GetAcceleration(): Vector3
 	return currentTrajectory.Acceleration
 end
 
+--[=[
+
+Gets the position of an ActiveBlockCast.
+
+@method GetPosition
+@within ActiveBlockCast
+@return Vector3 -- The current position of the ActiveBlockCast.
+]=]
 function ActiveCast:GetPosition(): Vector3
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -888,8 +925,14 @@ function ActiveCast:GetPosition(): Vector3
 	return GetPositionAtTime(self.StateInfo.TotalRuntime - currentTrajectory.StartTime, currentTrajectory.Origin, currentTrajectory.InitialVelocity, currentTrajectory.Acceleration)
 end
 
--- Add
+--[=[
 
+Add velocity to an ActiveBlockCast with the specified Vector3.
+
+@method AddVelocity
+@param velocity Vector3 -- The new velocity to add.
+@within ActiveBlockCast
+]=]
 function ActiveCast:AddVelocity(velocity: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -902,6 +945,14 @@ function ActiveCast:AddVelocity(velocity: Vector3)
 	self:SetVelocity(self:GetVelocity() + velocity)
 end
 
+--[=[
+
+Add acceleration to an ActiveBlockCast with the specified Vector3.
+
+@method AddAcceleration
+@param acceleration Vector3 -- The new acceleration to add.
+@within ActiveBlockCast
+]=]
 function ActiveCast:AddAcceleration(acceleration: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -914,6 +965,14 @@ function ActiveCast:AddAcceleration(acceleration: Vector3)
 	self:SetAcceleration(self:GetAcceleration() + acceleration)
 end
 
+--[=[
+
+Add position to an ActiveBlockCast with the specified Vector3.
+
+@method AddPosition
+@param position Vector3 -- The new position to add.
+@within ActiveBlockCast
+]=]
 function ActiveCast:AddPosition(position: Vector3)
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -926,8 +985,14 @@ function ActiveCast:AddPosition(position: Vector3)
 	self:SetPosition(self:GetPosition() + position)
 end
 
--- Others
+--[=[
 
+Pauses simulation for an ActiveBlockCast.
+
+@method Pause
+@within ActiveBlockCast
+
+]=]
 function ActiveCast:Pause()
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -940,6 +1005,14 @@ function ActiveCast:Pause()
 	self.StateInfo.Paused = true
 end
 
+--[=[
+
+Resumes simulation for an ActiveBlockCast if it was paused previously.
+
+@method Resume
+@within ActiveBlockCast
+
+]=]
 function ActiveCast:Resume()
 	assert(
 		getmetatable(self) == ActiveCast, 
@@ -952,6 +1025,14 @@ function ActiveCast:Resume()
 	self.StateInfo.Paused = false
 end
 
+--[=[
+
+Terminates an ActiveBlockCast, firing the CastTerminating event, and cleaning up resources. 
+This is the equivilant of calling `Active:Destroy()`.
+
+@method Resume
+@within ActiveBlockCast
+]=]
 function ActiveCast:Terminate()
 	assert(
 		getmetatable(self) == ActiveCast, 
