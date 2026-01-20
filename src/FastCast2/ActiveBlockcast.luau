@@ -16,6 +16,7 @@ local TypeDef = require(FastCastModule:WaitForChild("TypeDefinitions"))
 local Configs = require(FastCastModule:WaitForChild("Configs"))
 local DebugLogging = Configs.DebugLogging
 local FastCastEnums = require(FastCastModule:WaitForChild("FastCastEnums"))
+local FastCast = require(FastCastModule)
 
 -- CONSTs
 local MAX_PIERCE_TEST_COUNT = 100
@@ -86,6 +87,33 @@ local function CloneCastParams(params: RaycastParams): RaycastParams
 	clone.FilterDescendantsInstances = params.FilterDescendantsInstances
 	clone.IgnoreWater = params.IgnoreWater
 	return clone
+end
+
+local function ResolveCanPierceCheck(cast: TypeDef.ActiveBlockCast): TypeDef.CanPierceFunction?
+	local canPierceModule = cast.RayInfo.CanPierceModule
+	if canPierceModule == nil then
+		return nil
+	end
+
+	local loadedModule = require(canPierceModule)
+	if loadedModule == nil then
+		return nil
+	end
+
+	return loadedModule.Check
+end
+
+local function RunCanPierceCheck(
+	cast: TypeDef.ActiveBlockCast,
+	canPierceCheck: TypeDef.CanPierceFunction?,
+	resultOfCast: RaycastResult,
+	segmentVelocity: Vector3
+): boolean?
+	if canPierceCheck == nil then
+		return nil
+	end
+
+	return FastCast:SafeCall(canPierceCheck, cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
 end
 
 local function GetFastCastVisualizationContainer(): Instance
@@ -314,6 +342,8 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 		)
 	end
 
+	local canPierceCheck = ResolveCanPierceCheck(cast)
+
 	-- I'm kinda gay
 
 	if part and part ~= cast.RayInfo.CosmeticBulletObject then
@@ -322,13 +352,13 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 			print("Hit something, testing now.")
 		end
 
-		if cast.RayInfo.CanPierceBindableFunction == nil then
+		if canPierceCheck == nil then
 			if DebugLogging.RayPierce then
 				print("No piercing function set, proceeding to hit processing.")
 			end
 		end
 
-		if cast.RayInfo.CanPierceBindableFunction ~= nil then
+		if canPierceCheck ~= nil then
 			if expectingShortCall == false and cast.StateInfo.IsActivelySimulatingPierce then
 				cast:Terminate()
 				warn(
@@ -338,16 +368,7 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
 
-		if
-			cast.RayInfo.CanPierceBindableFunction == nil
-			or cast.RayInfo.CanPierceBindableFunction:Invoke(
-					cast,
-					resultOfCast,
-					segmentVelocity,
-					cast.RayInfo.CosmeticBulletObject
-				)
-				== false
-		then
+		if canPierceCheck == nil or RunCanPierceCheck(cast, canPierceCheck, resultOfCast, segmentVelocity) == false then
 			if DebugLogging.RayPierce then
 				print("Piercing function is nil or it returned FALSE to not pierce this hit.")
 			end
@@ -420,19 +441,10 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 							dbgSeg.Color3 = DBG_SEGMENT_SUB_COLOR
 						end
 
-						if
-							cast.RayInfo.CanPierceBindableFunction == nil
-							or (
-								cast.RayInfo.CanPierceBindableFunction ~= nil
-								and cast.RayInfo.CanPierceBindableFunction:Invoke(
-										cast,
-										subResult,
-										subVelocity,
-										cast.RayInfo.CosmeticBulletObject
-									)
-									== false
-							)
-						then
+					if
+						canPierceCheck == nil
+						or RunCanPierceCheck(cast, canPierceCheck, subResult, subVelocity) == false
+					then
 							cast.StateInfo.IsActivelyResimulating = false
 
 							SendRayHit(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject)
@@ -541,14 +553,7 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 				end
 				currentPierceTestCount = currentPierceTestCount + 1
 
-				if
-					cast.RayInfo.CanPierceBindableFunction(
-						cast,
-						resultOfCast,
-						segmentVelocity,
-						cast.RayInfo.CosmeticBulletObject
-					) == false
-				then
+				if RunCanPierceCheck(cast, canPierceCheck, resultOfCast, segmentVelocity) == false then
 					brokeFromSolidObject = true
 					break
 				end
@@ -612,7 +617,7 @@ function ActiveCast.new(
 	direction: Vector3,
 	velocity: Vector3 | number,
 	behavior: TypeDef.FastCastBehavior,
-	canpierce: BindableFunction
+	canpierce: TypeDef.CanPierceModule?
 ): TypeDef.ActiveCast
 	if typeof(velocity) == "number" then
 		velocity = direction.Unit * velocity
@@ -662,7 +667,7 @@ function ActiveCast.new(
 			WorldRoot = workspace,
 			MaxDistance = behavior.MaxDistance or DEFAULT_MAX_DISTANCE,
 			CosmeticBulletObject = behavior.CosmeticBulletTemplate,
-			CanPierceBindableFunction = canpierce
+			CanPierceModule = canpierce
 		},
 
 		CFrame = CFrame.new(),

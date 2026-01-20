@@ -15,7 +15,7 @@ local TypeDef = require(FastCastM:WaitForChild("TypeDefinitions"))
 local Signal = require(FastCastM:WaitForChild("Signal"))
 local ActiveCast = require(FastCastM:WaitForChild("ActiveCast"))
 local ActiveBlockcast = require(FastCastM:WaitForChild("ActiveBlockcast"))
-local BaseCastFunction: BindableFunction = nil
+local CanPierceModuleScript: ModuleScript? = nil
 --local ObjectCache = require(FastCastM:WaitForChild("ObjectCache"))
 
 --[=[
@@ -40,7 +40,6 @@ local Output = nil
 local ActiveCastCleaner = nil
 local ObjectCache = nil
 local CacheHolder = nil
-local CanPierceBindableFunction = nil
 
 -- Private functions
 
@@ -115,10 +114,6 @@ function BaseCast.Init(BindableOutput: BindableEvent, Data: any)
 		end
 	end)
 
-	CanPierceBindableFunction = Instance.new("BindableFunction")
-	CanPierceBindableFunction.Parent = Actor
-	CanPierceBindableFunction.Name = "CanPierceBindableFunction"
-
 	return self
 end
 
@@ -151,25 +146,21 @@ function BaseCast:Raycast(
 		Output = Output,
 		ActiveCastCleaner = ActiveCastCleaner,
 		ObjectCache = ObjectCache,
-	}, activeCastID, Origin, Direction, Velocity, Behavior, BaseCastFunction)
+	}, activeCastID, Origin, Direction, Velocity, Behavior, CanPierceModuleScript)
 end
 
 --[=[
 
-@method CanPierceFunction
+@method CanPierceModule
 @within BaseCast
 
-@param f TypeDef.CanPierceFunction? -- The function to set as the can pierce function.
+@param moduleScript ModuleScript? -- The module to set as the can pierce module.
 
-Set the can pierce function.
+Set the can pierce module.
 
 ]=]
-function BaseCast:SetCanPierceFunction(Caster: TypeDefinitions.Caster, f: TypeDefinitions.CanPierceFunction?)
-	print("i set that")
-	CanPierceBindableFunction.OnInvoke = f
-	CanPierceBindableFunction.OnInvoke()
-	BaseCastFunction = CanPierceBindableFunction
-	print(Caster)
+function BaseCast:SetCanPierceModule(Caster: TypeDefinitions.Caster, moduleScript: ModuleScript?)
+	CanPierceModuleScript = moduleScript
 end
 
 --[=[
@@ -202,7 +193,7 @@ function BaseCast:Blockcast(
 		Output = Output,
 		ActiveCastCleaner = ActiveCastCleaner,
 		ObjectCache = ObjectCache,
-	}, activeCastID, Origin, Size, Direction, Velocity, Behavior, BaseCastFunction)
+	}, activeCastID, Origin, Size, Direction, Velocity, Behavior, CanPierceModuleScript)
 end
 
 --[=[
@@ -267,10 +258,7 @@ function BaseCast:Destroy()
 		BulkMoveToConnection = nil
 	end
 
-	if CanPierceBindableFunction then
-		CanPierceBindableFunction.OnInvoke = nil
-		CanPierceBindableFunction = nil
-	end
+	CanPierceModuleScript = nil
 
 	for k, v in Actives do
 		v:Terminate()

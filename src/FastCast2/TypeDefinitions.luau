@@ -29,12 +29,12 @@ export type CanPierceFunction = (
 ) -> boolean
 
 --[=[
-	@type CanPierceBindableFunction BindableFunction
+	@type CanPierceModule ModuleScript
 	@within TypeDefinitions
 
-	BindableFunction used to decide whether a cast should pierce and continue after a hit.
+	ModuleScript used to decide whether a cast should pierce and continue after a hit.
 ]=]
-export type CanPierceBindableFunction = BindableFunction
+export type CanPierceModule = ModuleScript
 
 --[=[
 	@type OnRayHitFunction (ActiveCast, RaycastResult, Vector3, Instance?) -> ()
@@ -139,7 +139,7 @@ export type Caster = {
 		CacheHolder: Instance
 	) -> (),
 
-	SetCanPierceFunction: (self: Caster, CanPierceFunction) -> (),
+	SetCanPierceModule: (self: Caster, moduleScript: ModuleScript?) -> (),
 
 	RaycastFire: (
 		Caster,
@@ -268,7 +268,7 @@ export type CastStateInfo = {
 }
 
 --[=[
-	@type CastRayInfo { Parameters: RaycastParams, WorldRoot: WorldRoot, MaxDistance: number, CosmeticBulletObject: Instance?, CanPierceBindableFunction: BindableFunction }
+	@type CastRayInfo { Parameters: RaycastParams, WorldRoot: WorldRoot, MaxDistance: number, CosmeticBulletObject: Instance?, CanPierceModule: ModuleScript? }
 	@within TypeDefinitions
 
 	Represents ray info for an ActiveCast.
@@ -278,7 +278,7 @@ export type CastRayInfo = {
 	WorldRoot: WorldRoot,
 	MaxDistance: number,
 	CosmeticBulletObject: Instance?,
-	CanPierceBindableFunction: BindableFunction,
+	CanPierceModule: CanPierceModule?,
 }
 
 --[=[
@@ -317,7 +317,7 @@ export type ActiveCast = {
 }
 
 --[=[
-	@type BlockCastRayInfo { Parameters: RaycastParams, WorldRoot: WorldRoot, MaxDistance: number, CosmeticBulletObject: Instance?, CanPierceCallback: CanPierceFunction, Size: Vector3 }
+	@type BlockCastRayInfo { Parameters: RaycastParams, WorldRoot: WorldRoot, MaxDistance: number, CosmeticBulletObject: Instance?, CanPierceModule: ModuleScript?, Size: Vector3 }
 	@within TypeDefinitions
 
 	Ray info for block-cast variants.
@@ -327,7 +327,7 @@ export type BlockCastRayInfo = {
 	WorldRoot: WorldRoot,
 	MaxDistance: number,
 	CosmeticBulletObject: Instance?,
-	CanPierceCallback: CanPierceFunction,
+	CanPierceModule: CanPierceModule?,
 	Size: Vector3,
 }
 

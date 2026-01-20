@@ -245,19 +245,19 @@ function FastCast:Init(
 end
 
 --[=[
-	Sets the CanPierceFunction for the Caster.
-	@method SetCanPierceFunction
+	Sets the CanPierceModule for the Caster.
+	@method SetCanPierceModule
 	@within FastCast
 
-	@param f TypeDef.CanPierceFunction? -- The function to set.
+	@param moduleScript ModuleScript? -- The module to set.
 ]=]
-function FastCast:SetCanPierceFunction(f: TypeDef.CanPierceFunction?)
+function FastCast:SetCanPierceModule(moduleScript: ModuleScript?)
 	if not self.AlreadyInit then
 		error("Please Init caster")
 	end
-	print("im setting the canpiercefunction!")
+	print("im setting the canpiercemodule!")
 	-- darwin was here
-	self.Dispatcher:DispatchAll("SetCanPierceFunction", self, f)
+	self.Dispatcher:DispatchAll("SetCanPierceModule", self, moduleScript)
 end
 
 --[=[
@@ -333,8 +333,9 @@ end
 function FastCast:SafeCall(f: (...any) -> ...any, ...)
 	-- am i tripping
 	if f then
-		f(...)
+		return f(...)
 	end
+	return nil
 end
 
 --[=[

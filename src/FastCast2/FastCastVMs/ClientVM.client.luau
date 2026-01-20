@@ -52,9 +52,9 @@ actor:BindToMessage(
 )
 
 actor:BindToMessage(
-	"SetCanPierceFunction",
-	function(Caster: TypeDefinitions.Caster, f: TypeDefinitions.CanPierceFunction?)
-		BaseCast:SetCanPierceFunction(Caster, f)
+	"SetCanPierceModule",
+	function(Caster: TypeDefinitions.Caster, moduleScript: ModuleScript?)
+		BaseCast:SetCanPierceModule(Caster, moduleScript)
 	end
 )
 
