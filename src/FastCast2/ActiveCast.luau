@@ -20,7 +20,6 @@ local TypeDef = require(FastCastModule:WaitForChild("TypeDefinitions"))
 local Configs = require(FastCastModule:WaitForChild("Configs"))
 local DebugLogging = Configs.DebugLogging
 local FastCastEnums = require(FastCastModule:WaitForChild("FastCastEnums"))
-local SafeCall = require(FastCastModule).SafeCall
 -- Constants
 local MAX_PIERCE_TEST_COUNT = 100
 local FC_VIS_OBJ_NAME = "FastCastVisualizationObjects"
@@ -377,7 +376,7 @@ local function SimulateCast(cast: TypeDef.ActiveCast, delta: number, expectingSh
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
 
-		if canPierceCheck == nil or RunCanPierceCheck(cast, canPierceCheck, resultOfCast, segmentVelocity) then
+		if canPierceCheck == nil or RunCanPierceCheck(cast, canPierceCheck, resultOfCast, segmentVelocity) == false then
 			--PrintDebug("Piercing function is nil or it returned FALSE to not pierce this hit.")
 
 			if DebugLogging.RayPierce then
@@ -1137,3 +1136,10 @@ function ActiveCast:Terminate()
 end
 
 return ActiveCast
+local function SafeCall(f: (...any) -> ...any, ...)
+	-- am i tripping
+	if f then
+		return f(...)
+	end
+	return nil
+end

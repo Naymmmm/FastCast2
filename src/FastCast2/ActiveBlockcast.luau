@@ -16,7 +16,6 @@ local TypeDef = require(FastCastModule:WaitForChild("TypeDefinitions"))
 local Configs = require(FastCastModule:WaitForChild("Configs"))
 local DebugLogging = Configs.DebugLogging
 local FastCastEnums = require(FastCastModule:WaitForChild("FastCastEnums"))
-local FastCast = require(FastCastModule)
 
 -- CONSTs
 local MAX_PIERCE_TEST_COUNT = 100
@@ -63,6 +62,14 @@ local function DebrisAdd(obj: Instance, Lifetime: number)
 	task.delay(Lifetime, function()
 		obj:Destroy()
 	end)
+end
+
+local function SafeCall(f: (...any) -> ...any, ...)
+	-- am i tripping
+	if f then
+		return f(...)
+	end
+	return nil
 end
 
 local function GetPositionAtTime(
@@ -113,7 +120,7 @@ local function RunCanPierceCheck(
 		return nil
 	end
 
-	return FastCast:SafeCall(canPierceCheck, cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
+	return SafeCall(canPierceCheck, cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject)
 end
 
 local function GetFastCastVisualizationContainer(): Instance
