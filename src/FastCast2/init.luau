@@ -255,7 +255,6 @@ function FastCast:SetCanPierceModule(moduleScript: ModuleScript?)
 	if not self.AlreadyInit then
 		error("Please Init caster")
 	end
-	print("im setting the canpiercemodule!")
 	-- darwin was here
 	self.Dispatcher:DispatchAll("SetCanPierceModule", self, moduleScript)
 end
