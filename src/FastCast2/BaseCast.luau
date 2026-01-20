@@ -16,7 +16,13 @@ local ActiveCast = require(FastCastM:WaitForChild("ActiveCast"))
 local ActiveBlockcast = require(FastCastM:WaitForChild("ActiveBlockcast"))
 --local ObjectCache = require(FastCastM:WaitForChild("ObjectCache"))
 
--- BaseCast
+--[=[
+
+@class BaseCast
+@private
+Base class for all Raycast operations.
+
+]=]
 local BaseCast = {}
 BaseCast.__index = BaseCast
 BaseCast.__type = "BaseCast"
@@ -26,12 +32,13 @@ local BulkMoveToConnection : RBXScriptConnection = nil
 
 -- Variables
 -- Because each different threads have different BaseCast haha
-local Actives = {}
+local Actives: any = {}
 local Actor = nil
 local Output = nil
 local ActiveCastCleaner = nil
 local ObjectCache = nil
 local CacheHolder = nil
+local CanPierceBindableFunction = nil
 
 -- Private functions 
 
@@ -39,14 +46,14 @@ local function HandleBulkMoveTo()
 	local Parts : {BasePart} = {}
 	local CFrames : {CFrame} = {}
 
-	for _, ActiveCast : TypeDef.ActiveCast in Actives do
-		local ProjectilePart = ActiveCast.RayInfo.CosmeticBulletObject
+	for _, ActiveCasts in Actives do
+		local ProjectilePart = ActiveCasts.RayInfo.CosmeticBulletObject
 		if not ProjectilePart then continue end
 		if ProjectilePart:IsA("BasePart") then
 			table.insert(Parts, ProjectilePart)
-			table.insert(CFrames, ActiveCast.CFrame)
+			table.insert(CFrames, ActiveCasts.CFrame)
 		else
-			ProjectilePart:PivotTo(ActiveCast.CFrame)
+			ProjectilePart:PivotTo(ActiveCasts.CFrame)
 		end
 	end
 
@@ -56,8 +63,18 @@ local function HandleBulkMoveTo()
 	workspace:BulkMoveTo(Parts, CFrames, Enum.BulkMoveMode.FireCFrameChanged)
 end
 
--- Public functions
+--[=[
 
+@function Init
+@within BaseCast
+
+@param BindableOutput BindableEvent -- The BindableEvent used for outputting events.
+@param Data any -- Configuration data for the BaseCast.
+@return BaseCast -- The initialized BaseCast instance.
+
+To initialize a new BaseCast instance.
+
+]=]
 function BaseCast.Init(BindableOutput : BindableEvent, Data : any)
 	local self = setmetatable({}, BaseCast)
 	-- Others
@@ -94,9 +111,27 @@ function BaseCast.Init(BindableOutput : BindableEvent, Data : any)
 		end
 	end)
 
+	CanPierceBindableFunction = Instance.new("BindableFunction")
+	CanPierceBindableFunction.Parent = Actor
+	CanPierceBindableFunction.Name = "CanPierceBindableFunction"
+
 	return self
 end
 
+--[=[
+
+@method Raycast
+@within BaseCast
+
+@param Origin Vector3 -- The origin of the raycast.
+@param Direction Vector3 -- The direction of the raycast.
+@param Velocity Vector3 | number -- The velocity of the raycast.
+@param Behavior FastCastBehavior -- The behavior data for the raycast.
+@param GUID string -- The unique identifier for the raycast.
+
+Create a raycast.
+
+]=]
 function BaseCast:Raycast(
 	Origin : Vector3, 
 	Direction : Vector3, 
@@ -115,6 +150,35 @@ function BaseCast:Raycast(
 	}, activeCastID, Origin, Direction, Velocity, Behavior)
 end
 
+--[=[
+
+@method CanPierceFunction
+@within BaseCast
+
+@param f TypeDef.CanPierceFunction? -- The function to set as the can pierce function.
+
+Set the can pierce function.
+
+]=]
+function BaseCast:SetCanPierceFunction(f : TypeDef.CanPierceFunction?)
+       CanPierceBindableFunction.OnInvoke = f
+end
+
+--[=[
+
+@method Blockcast
+@within BaseCast
+
+@param Origin Vector3 -- The origin of the raycast.
+@param Size Vector3 -- The size of the blockcast.
+@param Direction Vector3 -- The direction of the raycast.
+@param Velocity Vector3 | number -- The velocity of the raycast.
+@param Behavior FastCastBehavior -- The behavior data for the raycast.
+@param GUID string -- The unique identifier for the raycast.
+
+Create a Blockcast.
+
+]=]
 function BaseCast:Blockcast(
 	Origin : Vector3,
 	Size : Vector3, 
@@ -133,6 +197,16 @@ function BaseCast:Blockcast(
 	}, activeCastID, Origin, Size, Direction, Velocity, Behavior)
 end
 
+--[=[
+
+@method BindBulkMoveTo
+@within BaseCast
+
+@param bool boolean -- Whether to enable or disable BulkMoveTo.
+
+Enables or disables the BulkMoveTo feature.
+
+]=]
 function BaseCast:BindBulkMoveTo(bool : boolean)
 	if bool then
 		BulkMoveToConnection = RS.PreRender:ConnectParallel(HandleBulkMoveTo)
@@ -144,6 +218,16 @@ function BaseCast:BindBulkMoveTo(bool : boolean)
 	end
 end
 
+--[=[
+
+@method BindObjectCache
+@within BaseCast
+
+@param bool boolean -- Whether to enable or disable ObjectCache.
+
+Enables or disables the ObjectCache feature.
+
+]=]
 function BaseCast:BindObjectCache(bool : boolean)
 	if bool then
 		if ObjectCache then return end
@@ -159,10 +243,23 @@ function BaseCast:BindObjectCache(bool : boolean)
 	end
 end
 
+--[=[
+
+@method Destroy
+@within BaseCast
+
+Destroys the BaseCast instance and cleans up resources.
+
+]=]
 function BaseCast:Destroy()
 	if BulkMoveToConnection then
 		BulkMoveToConnection:Disconnect()
 		BulkMoveToConnection = nil
+	end
+
+	if CanPierceBindableFunction then
+      CanPierceBindableFunction.OnInvoke = nil
+      CanPierceBindableFunction = nil
 	end
 	
 	for k, v in Actives do

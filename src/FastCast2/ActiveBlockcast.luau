@@ -224,7 +224,7 @@ local function SendCastFire(
 end
 
 local function SimulateCast(
-	cast : TypeDef.ActiveBlockCast, 
+	cast : TypeDef.ActiveCast, 
 	delta : number, 
 	expectingShortCall : boolean
 )
@@ -303,7 +303,7 @@ local function SimulateCast(
 			print("Hit something, testing now.")
 		end
 
-		if (cast.RayInfo.CanPierceCallback ~= nil) then
+		if (cast.Caster.CanPierceBindableFunction ~= nil) then
 			if expectingShortCall == false and cast.StateInfo.IsActivelySimulatingPierce then
 				cast:Terminate()
 				warn("WARN: The latest call to CanPierceCallback took too long to complete! This cast is going to suffer desyncs which WILL cause unexpected behavior and errors. Please fix your performance problems, or remove statements that yield (e.g. wait() calls)")
@@ -311,7 +311,7 @@ local function SimulateCast(
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
 
-		if cast.RayInfo.CanPierceCallback == nil or cast.RayInfo.CanPierceCallback(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
+		if cast.Caster.CanPierceBindableFunction == nil or cast.Caster.CanPierceBindableFunction:Invoke(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
 			
 			if DebugLogging.RayPierce then
 				print("Piercing function is nil or it returned FALSE to not pierce this hit.")	
@@ -363,7 +363,7 @@ local function SimulateCast(
 						local dbgSeg = DbgVisualizeSegment(CFrame.new(subPosition, subPosition + subVelocity), subDisplacement, VisualizeCasts, VisualizeCastSettings)
 						if (dbgSeg ~= nil) then dbgSeg.Color3 = DBG_SEGMENT_SUB_COLOR end
 
-						if cast.RayInfo.CanPierceCallback == nil or (cast.RayInfo.CanPierceCallback ~= nil and cast.RayInfo.CanPierceCallback(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject) == false) then
+						if cast.Caster.CanPierceBindableFunction == nil or (cast.Caster.CanPierceBindableFunction ~= nil and cast.Caster.CanPierceBindableFunction:Invoke(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject) == false) then
 							cast.StateInfo.IsActivelyResimulating = false
 
 							SendRayHit(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject)
@@ -452,7 +452,7 @@ local function SimulateCast(
 				end
 				currentPierceTestCount = currentPierceTestCount + 1;
 
-				if cast.RayInfo.CanPierceCallback(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
+				if cast.Caster.CanPierceBindableFunction(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
 					brokeFromSolidObject = true
 					break
 				end
@@ -481,6 +481,7 @@ end
 
 --[=[
 	@function new
+	@private
 	@within ActiveBlockCast
 
 	Creates a new ActiveBlockCast instance with the given parameters.
@@ -528,7 +529,7 @@ function ActiveCast.new(
 		behavior.HighFidelityBehavior = 3
 	end
 
-	local cast : TypeDef.ActiveBlockCast = {
+	local cast = {
 		Caster = BaseCast,
 
 		StateInfo = {
@@ -561,7 +562,6 @@ function ActiveCast.new(
 			WorldRoot = workspace,
 			MaxDistance = behavior.MaxDistance or DEFAULT_MAX_DISTANCE,
 			CosmeticBulletObject = behavior.CosmeticBulletTemplate,
-			CanPierceCallback = behavior.CanPierceFunction
 		},
 		
 		CFrame = CFrame.new(),
@@ -596,45 +596,6 @@ function ActiveCast.new(
 			targetContainer = behavior.CosmeticBulletContainer
 		end
 	end
-
-	--[[local usingProvider = false
-	if behavior.CosmeticBulletProvider == nil then
-		if cast.RayInfo.CosmeticBulletObject ~= nil then
-			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
-			cast.RayInfo.CosmeticBulletObject.CFrame = CFrame.new(origin, origin + direction)
-			cast.RayInfo.CosmeticBulletObject.Parent = behavior.CosmeticBulletContainer
-		end
-	else
-		local LIB_GETPART = LookUpTables.Supported_Lib_GETPART[typeof(behavior.CosmeticBulletProvider)]
-		if cast.RayInfo.CosmeticBulletObject ~= nil then
-			warn("Do not define FastCastBehavior.CosmeticBulletTemplate and FastCastBehavior.CosmeticBulletProvider at the same time! The provider will be used, and CosmeticBulletTemplate will be set to nil.")
-			cast.RayInfo.CosmeticBulletObject = nil
-			behavior.CosmeticBulletTemplate = nil
-		end
-
-		if LIB_GETPART then
-			cast.RayInfo.CosmeticBulletObject = LIB_GETPART(behavior.CosmeticBulletProvider, origin, direction)
-			usingProvider = true
-		else
-			warn("FastCastBehavior.CosmeticBulletProvider was not an instance of the PartCache module (an external/separate model)! Are you inputting an instance created via PartCache.new? If so, are you on the latest version of PartCache? Setting FastCastBehavior.CosmeticBulletProvider to nil.")
-			behavior.CosmeticBulletProvider = nil
-		end
-	end
-
-	-- CosmeticBulletObject Container GET
-
-	local targetContainer: Instance;
-	local LIB_GETCONTAINER = LookUpTables.Supported_Lib_GETCONTAINER[typeof(behavior.CosmeticBulletProvider)]
-
-	if usingProvider then
-		if LIB_GETCONTAINER then
-			targetContainer = LIB_GETCONTAINER(behavior.CosmeticBulletProvider)
-		else
-			warn("No TargetContainer for Supported lib")
-		end
-	else
-		targetContainer = behavior.CosmeticBulletContainer
-	end]]
 
 	-- the rest? :P
 

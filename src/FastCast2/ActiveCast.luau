@@ -15,6 +15,7 @@ local FastCastModule = script.Parent
 
 -- Dependencies
 
+local TypeDefinitions = require(script.Parent.TypeDefinitions)
 local TypeDef = require(FastCastModule:WaitForChild("TypeDefinitions"))
 local Configs = require(FastCastModule:WaitForChild("Configs"))
 local DebugLogging = Configs.DebugLogging
@@ -323,7 +324,7 @@ local function SimulateCast(
 			cast.StateInfo.IsActivelySimulatingPierce = true
 		end
 
-		if cast.RayInfo.CanPierceCallback == nil or cast.RayInfo.CanPierceCallback(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
+		if cast.Caster.CanPierceBindableFunction == nil or cast.Caster.CanPierceBindableFunction:Invoke(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject) then
 			--PrintDebug("Piercing function is nil or it returned FALSE to not pierce this hit.")
 
 			if DebugLogging.RayPierce then
@@ -382,7 +383,7 @@ local function SimulateCast(
 						local dbgSeg = DbgVisualizeSegment(CFrame.new(subPosition, subPosition + subVelocity), subDisplacement, VisualizeCasts, VisualizeCastSettings)
 						if (dbgSeg ~= nil) then dbgSeg.Color3 = DBG_SEGMENT_SUB_COLOR end
 
-						if cast.RayInfo.CanPierceCallback == nil or (cast.RayInfo.CanPierceCallback ~= nil and cast.RayInfo.CanPierceCallback(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject) == false) then
+						if cast.Caster.CanPierceBindableFunction == nil or cast.Caster.CanPierceBindableFunction:Invoke(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject) == false then
 							cast.StateInfo.IsActivelyResimulating = false
 
 							SendRayHit(cast, subResult, subVelocity, cast.RayInfo.CosmeticBulletObject)
@@ -478,7 +479,7 @@ local function SimulateCast(
 				end
 				currentPierceTestCount = currentPierceTestCount + 1;
 
-				if cast.RayInfo.CanPierceCallback(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
+				if cast.Caster.CanPierceBindableFunction:Invoke(cast, resultOfCast, segmentVelocity, cast.RayInfo.CosmeticBulletObject) == false then
 					brokeFromSolidObject = true
 					break
 				end
@@ -556,7 +557,7 @@ function ActiveCast.new(
 	end
 
 
-	local cast : TypeDef.ActiveCast = {
+	local cast: TypeDefinitions.ActiveCast = {
 		Caster = BaseCast,
 
 		StateInfo = {
@@ -588,14 +589,14 @@ function ActiveCast.new(
 			WorldRoot = workspace,
 			MaxDistance = behavior.MaxDistance or DEFAULT_MAX_DISTANCE,
 			CosmeticBulletObject = behavior.CosmeticBulletTemplate,
-			CanPierceCallback = behavior.CanPierceFunction
+			CanPierceBindableFunction = behavior.CanPierceBindableFunction
 		},
 
 		UserData = {},
 		
 		CFrame = CFrame.new(),
 		ID = activeCastID
-	}
+	} :: any
 
 	--[[if cast.StateInfo.HighFidelityBehavior == 2 then
 		cast.StateInfo.HighFidelityBehavior = 3
@@ -627,46 +628,6 @@ function ActiveCast.new(
 			targetContainer = behavior.CosmeticBulletContainer
 		end
 	end
-
-	--[[local usingProvider = false
-	if behavior.CosmeticBulletProvider == nil then
-		if cast.RayInfo.CosmeticBulletObject ~= nil then
-			cast.RayInfo.CosmeticBulletObject = cast.RayInfo.CosmeticBulletObject:Clone()
-			cast.RayInfo.CosmeticBulletObject.CFrame = CFrame.new(origin, origin + direction)
-			cast.RayInfo.CosmeticBulletObject.Parent = behavior.CosmeticBulletContainer
-		end
-	else
-		local LIB_GETPART = LookUpTables.Supported_Lib_GETPART[typeof(behavior.CosmeticBulletProvider)] or LookUpTables.Supported_Lib_GETPART[behavior.CosmeticBulletProvider.Type]
-		if cast.RayInfo.CosmeticBulletObject ~= nil then
-			warn("Do not define FastCastBehavior.CosmeticBulletTemplate and FastCastBehavior.CosmeticBulletProvider at the same time! The provider will be used, and CosmeticBulletTemplate will be set to nil.")
-			cast.RayInfo.CosmeticBulletObject = nil
-			behavior.CosmeticBulletTemplate = nil
-		end
-		
-		if LIB_GETPART then
-			cast.RayInfo.CosmeticBulletObject = LIB_GETPART(behavior.CosmeticBulletProvider, origin, direction)
-			usingProvider = true
-		else
-			warn("FastCastBehavior.CosmeticBulletProvider was not an instance of the PartCache module (an external/separate model)! Are you inputting an instance created via PartCache.new? If so, are you on the latest version of PartCache? Setting FastCastBehavior.CosmeticBulletProvider to nil.")
-			behavior.CosmeticBulletProvider = nil
-		end
-	end
-	
-	-- CosmeticBulletObject Container GET
-	
-	local targetContainer: Instance;
-	local LIB_GETCONTAINER = LookUpTables.Supported_Lib_GETCONTAINER[typeof(behavior.CosmeticBulletProvider)] or LookUpTables.Supported_Lib_GETCONTAINER[behavior.CosmeticBulletProvider.Type]
-	
-	if usingProvider then
-		if LIB_GETCONTAINER then
-			targetContainer = LIB_GETCONTAINER(behavior.CosmeticBulletProvider)
-		else
-			warn("No TargetContainer for Supported lib")
-		end
-	else
-		targetContainer = behavior.CosmeticBulletContainer
-	end
-	]]
 
 	-- the rest? :P
 

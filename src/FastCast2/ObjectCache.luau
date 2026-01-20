@@ -6,6 +6,8 @@
 --[=[
 
 @class ObjectCache
+@private
+@external ObjectCache https://devforum.roblox.com/t/objectcache-a-modern-blazing-fast-model-and-part-cache/3104112
 ObjectCache usage should be derived from their DevForum post:
 
 https://devforum.roblox.com/t/objectcache-a-modern-blazing-fast-model-and-part-cache/3104112

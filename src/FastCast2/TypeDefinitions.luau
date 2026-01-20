@@ -16,12 +16,20 @@
 local Dispatcher = require(script.Parent:WaitForChild("FastCastVMs"))
 
 --[=[
-	@type CanPierceFunction (ActiveCast, RaycastResult, Vector3) -> boolean
+	@type CanPierceFunction (ActiveCast, RaycastResult, Vector3, Instance?) -> boolean
 	@within TypeDefinitions
 
 	Callback used to decide whether a cast should pierce and continue after a hit.
 ]=]
-export type CanPierceFunction = (ActiveCast, RaycastResult, Vector3) -> boolean
+export type CanPierceFunction = (ActiveCast, RaycastResult, segmentVelocity : Vector3, cosmeticBulletObject : Instance?) -> boolean
+
+--[=[
+	@type CanPierceBindableFunction BindableFunction
+	@within TypeDefinitions
+
+	BindableFunction used to decide whether a cast should pierce and continue after a hit.
+]=]
+export type CanPierceBindableFunction = BindableFunction
 
 --[=[
 	@type OnRayHitFunction (ActiveCast, RaycastResult, Vector3, Instance?) -> ()
@@ -93,6 +101,7 @@ export type Caster = {
 	CastFire: RBXScriptSignal,
 	Dispatcher : Dispatcher.Dispatcher,
 	AlreadyInit : boolean,
+	CanPierceBindableFunction : CanPierceBindableFunction?,
 	--id : string,
 
 	Init : (
@@ -158,7 +167,7 @@ export type AdaptivePerformance = {
 }
 
 --[=[
-	@type FastCastBehavior { RaycastParams: RaycastParams?, MaxDistance: number, Acceleration: Vector3, HighFidelityBehavior: number, HighFidelitySegmentSize: number, CosmeticBulletTemplate: Instance?, CosmeticBulletContainer: Instance?, AutoIgnoreContainer: boolean, CanPierceFunction: CanPierceFunction?, UseLengthChanged: boolean, SimulateAfterPhysic: boolean, AutomaticPerformance: boolean, AdaptivePerformance: AdaptivePerformance, VisualizeCasts: boolean, VisualizeCastSettings: VisualizeCastSettings }
+	@type FastCastBehavior { RaycastParams: RaycastParams?, MaxDistance: number, Acceleration: Vector3, HighFidelityBehavior: number, HighFidelitySegmentSize: number, CosmeticBulletTemplate: Instance?, CosmeticBulletContainer: Instance?, AutoIgnoreContainer: boolean, UseLengthChanged: boolean, SimulateAfterPhysic: boolean, AutomaticPerformance: boolean, AdaptivePerformance: AdaptivePerformance, VisualizeCasts: boolean, VisualizeCastSettings: VisualizeCastSettings }
 	@within TypeDefinitions
 
 	Represents a FastCastBehavior configuration.
@@ -172,7 +181,6 @@ export type FastCastBehavior = {
 	CosmeticBulletTemplate: Instance?,
 	CosmeticBulletContainer: Instance?,
 	AutoIgnoreContainer: boolean,
-	CanPierceFunction: CanPierceFunction?,
 	UseLengthChanged : boolean,
 	SimulateAfterPhysic : boolean,
 
@@ -240,7 +248,7 @@ export type CastRayInfo = {
 	Represents an ActiveCast instance.
 ]=]
 export type ActiveCast = {
-	Caster : BaseCastData,
+	Caster : Caster,
 	StateInfo: CastStateInfo,
 	RayInfo: CastRayInfo,
 	UserData: {[any]: any},

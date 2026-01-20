@@ -239,6 +239,18 @@ function FastCast:Init(
 end
 
 --[=[
+	Sets the CanPierceFunction for the Caster.
+	@method SetCanPierceFunction
+	@within FastCast
+
+	@param f TypeDef.CanPierceFunction? -- The function to set.
+]=]
+function FastCast:SetCanPierceFunction(f : TypeDef.CanPierceFunction?)
+	-- darwin was here
+    self.Dispatcher:DispatchAll("SetCanPierceFunction", f)
+end
+
+--[=[
 	Raycasts the Caster with the specified parameters.
 	@method RaycastFire
 	@within FastCast

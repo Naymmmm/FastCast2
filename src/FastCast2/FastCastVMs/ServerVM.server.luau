@@ -57,6 +57,10 @@ end)
 	StoredCasts[casterID][ID] = ActiveBlockcast.new(caster, origin, size, direction, velocity, behavior)
 end)]]
 
+actor:BindToMessage("SetCanPierceFunction", function(f : TypeDef.CanPierceFunction?)
+	BaseCast:SetCanPierceFunction(f)
+end)
+
 actor:BindToMessage("Blockcast", function(
 	origin : Vector3,
 	size : Vector3,

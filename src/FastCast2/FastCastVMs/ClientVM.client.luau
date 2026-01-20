@@ -49,6 +49,10 @@ actor:BindToMessage("Raycast", function(
 	BaseCast:Raycast(origin, direction, velocity, behavior, guid)
 end)
 
+actor:BindToMessage("SetCanPierceFunction", function(f : TypeDef.CanPierceFunction?)
+	BaseCast:SetCanPierceFunction(f)
+end)
+
 --[[actor:BindToMessage("Blockcast", function(
 	casterID : string,
 	caster : TypeDef.ActiveBlockCast,
