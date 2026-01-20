@@ -167,6 +167,7 @@ Set the can pierce function.
 function BaseCast:SetCanPierceFunction(Caster: TypeDefinitions.Caster, f: TypeDefinitions.CanPierceFunction?)
 	print("i set that")
 	CanPierceBindableFunction.OnInvoke = f
+	CanPierceBindableFunction.OnInvoke()
 	BaseCastFunction = CanPierceBindableFunction
 	print(Caster)
 end
